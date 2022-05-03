@@ -18,7 +18,7 @@ module Xliff
       fragment = Nokogiri::XML.fragment('')
       node = fragment.document.create_element(@element)
 
-      @attributes.each do |key,value|
+      @attributes.each do |key, value|
         node[key] = value
       end
 
@@ -37,15 +37,6 @@ module Xliff
         element: xml.name,
         attributes: xml.keys.to_h { |k| [k, xml[k]] }
       )
-    end
-
-    private
-
-    def is_valid_attribute(value)
-      return true if value.is_a? String
-      return true if value.is_a? Integer
-
-      return false
     end
   end
 end

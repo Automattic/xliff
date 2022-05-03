@@ -45,7 +45,7 @@ def new_entry(id: 'id', source: 'source', target: 'target', note: nil)
   )
 end
 
-def new_header(element: 'header', attributes: {foo: 'bar'})
+def new_header(element: 'header', attributes: { foo: 'bar' })
   Xliff::Header.new(
     element: element,
     attributes: attributes
