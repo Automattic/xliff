@@ -11,23 +11,23 @@ module Xliff
     # source translation is not a suitable unique identifier.
     #
     # @return [String]
-    attr_reader :id
+    attr_accessor :id
 
     # The original text
     # @return [String]
-    attr_reader :source
+    attr_accessor :source
 
     # The translated text
     # @return [String]
-    attr_reader :target
+    attr_accessor :target
 
     # Documentation for translators understand the context of a string
     # @return [String]
-    attr_reader :note
+    attr_accessor :note
 
     # The XML whitespace processing behaviour
     # @return [String]
-    attr_reader :xml_space
+    attr_accessor :xml_space
 
     # Create a blank Entry object
     #
