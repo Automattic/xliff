@@ -22,5 +22,5 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new do |verify|
-  verify.threshold = 91.5
+  verify.threshold = 91.6
 end

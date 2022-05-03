@@ -72,7 +72,7 @@ module Xliff
       @entries << entry
     end
 
-    # Encode this `File` object to an Nokogiri XML Element Representation of a `<file>` element
+    # Encode this {File} object as an XLIFF document fragment representing the {File}
     #
     # Also encodes any headers and translation strings as children of the `File` element.
     #
