@@ -44,8 +44,6 @@ RSpec.describe Xliff::Bundle do
     it 'can decode/encode with identical output' do
       xml = sample_file_contents('infoplist-strings.xliff')
       bundle = described_class.from_string(xml)
-      puts xml.inspect
-      puts bundle.to_s.inspect
 
       expect(bundle.to_s).to eq xml
     end
