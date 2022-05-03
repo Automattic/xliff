@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'lib/xliff/version'
-
 Gem::Specification.new do |spec|
   spec.name = 'xliff'
-  spec.version = Xliff::VERSION
+  spec.version = '0.1.0'
   spec.authors = ['Automattic']
   spec.email = ['mobile@automattic.com']
 

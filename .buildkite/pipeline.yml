@@ -28,7 +28,7 @@ steps:
     plugins: [*docker_plugin]
 
   #################
-  # Lint
+  # Lint (Code)
   #################
   - label: "🧹 Lint (Rubocop)"
     key: rubocop
@@ -37,6 +37,17 @@ steps:
 
       echo "--- :rubocop: Run Rubocop"
       bundle exec rubocop
+    plugins: [*docker_plugin]
+
+  #################
+  # Lint (Documentation)
+  #################
+  - label: "🧹 Lint (Yardstick)"
+    key: yardstick
+    command: |
+      bundle install
+      bundle exec rake yardstick_measure
+      bundle exec rake verify_measurements
     plugins: [*docker_plugin]
 
   #################
