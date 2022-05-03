@@ -1,0 +1,17 @@
+# Docs
+.yardoc
+doc
+yard-doc
+
+# Build Products
+pkg
+
+# Dependencies
+vendor
+
+# Tests
+.rspec_status
+coverage
+
+# macOS
+.DS_Store

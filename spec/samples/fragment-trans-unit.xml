@@ -1,0 +1,5 @@
+<trans-unit id="CFBundleDisplayName" xml:space="preserve">
+  <source>Woo</source>
+  <target>Woof</target>
+  <note>Bundle display name</note>
+</trans-unit>

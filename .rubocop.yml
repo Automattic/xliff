@@ -1,0 +1,10 @@
+AllCops:
+  TargetRubyVersion: 2.7.4
+  NewCops: enable
+
+# Don't fail for having too many tests
+Metrics/BlockLength:
+  IgnoredMethods: ['describe']
+
+require:
+  - rubocop-rspec
