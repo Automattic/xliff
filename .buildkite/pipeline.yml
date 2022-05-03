@@ -1,0 +1,55 @@
+# Nodes with values to reuse in the pipeline.
+common_params:
+  plugins:
+  - &docker_plugin
+    docker#v3.8.0:
+      image: &ruby_version "ruby:2.7.4"
+      propagate-environment: true
+      # environment:
+      #   - "RUBYGEMS_API_KEY"
+  - &docker_plugin_with_danger_token
+    docker#v3.8.0:
+      image: *ruby_version
+      propagate-environment: true
+      # environment:
+      #   - "DANGER_GITHUB_API_TOKEN"
+
+steps:
+  #################
+  # Build and Test
+  #################
+  - label: "🧪 Build and Test"
+    key: test
+    command: |
+      bundle install
+
+      echo "--- :rubocop: Run Tests"
+      bundle exec rspec
+    plugins: [*docker_plugin]
+
+  #################
+  # Lint
+  #################
+  - label: "🧹 Lint (Rubocop)"
+    key: rubocop
+    command: |
+      bundle install
+
+      echo "--- :rubocop: Run Rubocop"
+      bundle exec rubocop
+    plugins: [*docker_plugin]
+
+  #################
+  # Danger
+  #################
+  - label: "⛔️ Danger"
+    key: danger
+    command: |
+      bundle install
+
+      echo "--- :rspec: Generate Code Coverage Data"
+      bundle exec rspec
+
+      echo "--- :warning: Run Danger"
+      bundle exec danger
+    plugins: [*docker_plugin_with_danger_token]
