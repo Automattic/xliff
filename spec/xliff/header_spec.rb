@@ -7,15 +7,15 @@ RSpec.describe Xliff::Header do
     end
 
     it 'properly stores the attributes' do
-      expect(described_class.new(element: 'foo', attributes: {key: 'value'}).attributes[:key]).to eq 'value'
+      expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes[:key]).to eq 'value'
     end
 
     it 'coerces scalars attributes to strings' do
-      expect(described_class.new(element: 'foo', attributes: {key: 1}).attributes[:key]).to eq '1'
+      expect(described_class.new(element: 'foo', attributes: { key: 1 }).attributes[:key]).to eq '1'
     end
 
     it 'coerces non-scalars to strings' do
-      expect(described_class.new(element: 'foo', attributes: {key: {}}).attributes[:key]).to eq '{}'
+      expect(described_class.new(element: 'foo', attributes: { key: {} }).attributes[:key]).to eq '{}'
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe Xliff::Header do
     end
 
     it 'has the correct attributes' do
-      expect(new_header(attributes: {test: 1234}).to_xml['test']).to eq '1234'
+      expect(new_header(attributes: { test: 1234 }).to_xml['test']).to eq '1234'
     end
   end
 
@@ -51,9 +51,6 @@ RSpec.describe Xliff::Header do
 
     it 'parses the `attributes` correctly' do
       expect(valid_header.attributes['tool-id']).to eq 'com.apple.dt.xcode'
-      expect(valid_header.attributes['tool-name']).to eq 'Xcode'
-      expect(valid_header.attributes['tool-version']).to eq '13.2.1'
-      expect(valid_header.attributes['build-num']).to eq '13C100'
     end
   end
 

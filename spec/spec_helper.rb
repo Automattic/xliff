@@ -3,8 +3,10 @@
 require 'xliff'
 require 'nokogiri'
 require 'simplecov'
+require 'simplecov-json'
 
 SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter unless ENV['CI'].nil?
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -43,7 +45,7 @@ def new_entry(id: 'id', source: 'source', target: 'target', note: nil)
   )
 end
 
-def new_header(element: 'header', attributes: {foo: 'bar'})
+def new_header(element: 'header', attributes: { foo: 'bar' })
   Xliff::Header.new(
     element: element,
     attributes: attributes
