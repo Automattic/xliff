@@ -3,8 +3,10 @@
 require 'xliff'
 require 'nokogiri'
 require 'simplecov'
+require 'simplecov-json'
 
 SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter unless ENV['CI'].nil?
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
