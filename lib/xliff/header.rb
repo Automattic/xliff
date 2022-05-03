@@ -7,9 +7,15 @@ module Xliff
   #
   # Headers have an element and a set of key/value pairs encoded as XML attributes.
   class Header
-    attr_reader :element, :attributes
+    # This header's element
+    # @return [String]
+    attr_reader :element
 
-    # Create a blank Header object.
+    # This header's element
+    # @return [Hash<String, String>]
+    attr_reader :attributes
+
+    # Create a blank Header object
     #
     # Most often used to build an XLIFF file by hand.
     #
@@ -20,7 +26,9 @@ module Xliff
       @attributes = attributes.transform_values(&:to_s)
     end
 
-    # Encode this {Xliff::Header} object as an Nokogiri XML Element Representation of this header's expected element.
+    # Encode this {Xliff::Header} object as an Nokogiri XML Element Representation of this header's expected element
+    #
+    # @return [Nokogiri::XML.fragment]
     def to_xml
       fragment = Nokogiri::XML.fragment('')
       node = fragment.document.create_element(@element)
@@ -32,12 +40,14 @@ module Xliff
       node
     end
 
-    # Encode this {Xliff::Header} object to an XML string
+    # Encode this {Header} object to an XML string
+    #
+    # @return [String]
     def to_s
       to_xml.to_xml
     end
 
-    # Decode the given XML into an {Xliff::Header} object, if possible.
+    # Decode the given XML into an {Xliff::Header} object, if possible
     #
     # Raises for invalid input.
     #

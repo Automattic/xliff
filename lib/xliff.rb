@@ -7,4 +7,5 @@ require_relative 'xliff/header'
 require_relative 'xliff/xml_extensions'
 
 # Namespace for classes and modules that handle building and parsing XLIFF files.
-module Xliff;end
+# @api public
+module Xliff; end
