@@ -6,6 +6,14 @@ module Xliff
     attr_reader :headers, :entries
     attr_accessor :original, :source_language, :target_language, :datatype
 
+    # Create a blank File object.
+    #
+    # Most often used to build an XLIFF file by hand.
+    #
+    # @param [String] original The original file name.
+    # @param [String] source_language The locale code for the source language.
+    # @param [String] target_language The locale code for the translated language. This usually matches the `source_language` for files to be translated – it will differ if the file has been translated.
+    # @param [String] datatype The type of data represented – there are a variety of programming languages that can be represented. Defaults to `plaintext`.
     def initialize(original:, source_language:, target_language:, datatype: 'plaintext')
       @original = original
       @source_language = source_language
@@ -18,7 +26,7 @@ module Xliff
 
     # Add arbitrary header data to the file.
     #
-    # @param Xliff::Header A translation file header
+    # @param [Xliff::Header] header A translation file header.
     def add_header(header)
       raise unless header.is_a? Xliff::Header
 
@@ -27,7 +35,7 @@ module Xliff
 
     # Add a translation entry to the file.
     #
-    # @param Xliff::Entry A translation unit
+    # @param [Xliff::Entry] entry A translation unit.
     def add_entry(entry)
       raise unless entry.is_a? Xliff::Entry
 
@@ -59,7 +67,9 @@ module Xliff
     # Decode the given XML into an {Xliff::File} object, if possible.
     #
     # Raises for invalid input, and parses all child translation entries.
-    # @param Nokogiri::XML A translation unit
+    #
+    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @return [File]
     def self.from_xml(xml)
       validate_source_xml(xml)
 
@@ -76,6 +86,9 @@ module Xliff
       file
     end
 
+    # Run a series of validations against the input XML.
+    #
+    # Automatically run prior to attempting to parse using `from_xml`.
     def self.validate_source_xml(xml)
       raise if xml.nil?
       raise 'Invalid File XML – the root node must be `<file>`' if xml.name != 'file'
@@ -83,6 +96,7 @@ module Xliff
 
     private
 
+    # Encode the file headers into their XML representation.
     def add_headers_to_file(fragment, node)
       return if @headers.empty?
 
@@ -93,6 +107,7 @@ module Xliff
       node.add_child(header)
     end
 
+    # Encode the file's translation entries into their XML representation.
     def add_entries_to_file(fragment, node)
       return if @entries.empty?
 

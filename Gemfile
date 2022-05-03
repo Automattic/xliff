@@ -20,3 +20,6 @@ gem 'simplecov-json', '~> 0.2'
 gem 'danger', '~> 8.6'
 gem 'danger-rubocop', '~> 0.10'
 gem 'danger-simplecov_json', '~> 0.3'
+
+gem 'yard', '~> 0.9.27'
+gem 'yardstick', '~> 0.9.9'

@@ -7,6 +7,15 @@ module Xliff
   class Entry
     attr_accessor :id, :source, :target, :note, :xml_space
 
+    # Create a blank Entry object.
+    #
+    # Most often used to build an XLIFF file by hand.
+    #
+    # @param [String] id A unique identifier for this string. This will often match the source language string, but can also be used for cases where the source translation is not a suitable unique identifier.
+    # @param [String] source The original text.
+    # @param [String] target The translated text.
+    # @param [String] note Documentation for translators to help them understand the context of a string.
+    # @param [String] xml_space The XML whitespace processing behaviour.
     def initialize(id:, source:, target:, note: nil, xml_space: 'default')
       @id = id
       @source = source

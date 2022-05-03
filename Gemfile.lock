@@ -143,6 +143,8 @@ GEM
     webrick (1.7.0)
     yard (0.9.27)
       webrick (~> 1.7.0)
+    yardstick (0.9.9)
+      yard (~> 0.8, >= 0.8.7.2)
 
 PLATFORMS
   ruby
@@ -162,6 +164,7 @@ DEPENDENCIES
   simplecov-json (~> 0.2)
   xliff!
   yard (~> 0.9.27)
+  yardstick (~> 0.9.9)
 
 BUNDLED WITH
-   2.3.12
+   2.3.9
