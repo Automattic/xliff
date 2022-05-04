@@ -114,8 +114,8 @@ module Xliff
         datatype: xml['datatype'] || nil
       )
 
-      xml.at('header').element_children.each { |node| file.add_header Header.from_xml(node) }
-      xml.at('body').element_children.each { |node| file.add_entry Entry.from_xml(node) }
+      import_file_header(xml, file)
+      import_file_body(xml, file)
 
       file
     end
@@ -127,8 +127,37 @@ module Xliff
     # @raise [ExceptionClass] Raises exceptions if the input XML does not match expectations.
     # @return [void]
     def self.validate_source_xml(xml)
-      raise if xml.nil?
+      raise 'File XML is nil' if xml.nil?
+      raise "Invalid File XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid File XML – the root node must be `<file>`' if xml.name != 'file'
+    end
+
+    # Import File Header Tags from given XML
+    #
+    # Parses the `<header>` XML tag and imports any headers into the file.
+    #
+    # @api private
+    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @param [File] file The {File} object being created.
+    # @return [void]
+    private_class_method def self.import_file_header(xml, file)
+      return if xml.at('header').nil?
+
+      xml.at('header').element_children.each { |node| file.add_header Header.from_xml(node) }
+    end
+
+    # Import File <trans-unit> Tags from given XML
+    #
+    # Parses the `<body>` XML tag and imports any translation entries into the file.
+    #
+    # @api private
+    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @param [File] file The {File} object being created.
+    # @return [void]
+    private_class_method def self.import_file_body(xml, file)
+      return if xml.at('body').nil?
+
+      xml.at('body').element_children.each { |node| file.add_entry Entry.from_xml(node) }
     end
 
     private
