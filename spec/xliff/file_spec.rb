@@ -31,6 +31,48 @@ RSpec.describe Xliff::File do
     end
   end
 
+  describe '#from_xml' do
+    let(:valid_file) { described_class.from_xml(sample_file_xml('fragment-valid-file.xml')) }
+
+    it 'raises for nil xml' do
+      expect { described_class.from_xml(nil) }.to raise_exception 'File XML is nil'
+    end
+
+    it 'raises for the wrong kind of object' do
+      msg = 'Invalid File XML – must be a nokogiri object, got `String`'
+      expect { described_class.from_xml('<xml />') }.to raise_exception msg
+    end
+
+    it 'raises for invalid xml' do
+      exp = 'Invalid File XML – the root node must be `<file>`'
+      expect { described_class.from_xml(Nokogiri::XML('<xml />').document.root) }.to raise_exception exp
+    end
+
+    it 'parses the `original` correctly' do
+      expect(valid_file.original).to eq 'Resources/en.lproj/InfoPlist.strings'
+    end
+
+    it 'parses the `source-language` correctly' do
+      expect(valid_file.source_language).to eq 'en'
+    end
+
+    it 'parses the `target-language` correctly' do
+      expect(valid_file.target_language).to eq 'fr'
+    end
+
+    it 'parses the `datatype` correctly' do
+      expect(valid_file.datatype).to eq 'plaintext'
+    end
+
+    it 'correctly parses file with missing header tag' do
+      expect(described_class.from_xml(sample_file_xml('fragment-empty-file.xml')).headers).to be_empty
+    end
+
+    it 'correctly parses file with missing body tag' do
+      expect(described_class.from_xml(sample_file_xml('fragment-empty-file.xml')).entries).to be_empty
+    end
+  end
+
   describe '.to_xml' do
     it 'produces valid XML' do
       expect(new_file.to_xml).to be_a Nokogiri::XML::Element

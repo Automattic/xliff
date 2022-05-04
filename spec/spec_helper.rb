@@ -20,19 +20,6 @@ RSpec.configure do |config|
   end
 end
 
-## YARD Documentation Coverage
-require 'yardstick/rake/measurement'
-
-Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
-  measurement.output = 'coverage/yard-coverage.txt'
-end
-
-require 'yardstick/rake/verify'
-
-Yardstick::Rake::Verify.new do |verify|
-  verify.threshold = 100
-end
-
 ## Test Helpers
 
 def parse_xml(xml)
