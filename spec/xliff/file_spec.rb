@@ -31,6 +31,20 @@ RSpec.describe Xliff::File do
     end
   end
 
+  describe '.entry_with_id' do
+    it 'finds an entry with the given id' do
+      file = new_file
+      file.add_entry(new_entry(id: '1234'))
+
+      expect(file.entry_with_id('1234').id).to eq '1234'
+    end
+
+    it 'returns nil if not found' do
+      file = new_file
+      expect(file.entry_with_id('1234')).to be_nil
+    end
+  end
+
   describe '#from_xml' do
     let(:valid_file) { described_class.from_xml(sample_file_xml('fragment-valid-file.xml')) }
 
