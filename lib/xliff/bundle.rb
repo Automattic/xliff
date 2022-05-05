@@ -45,6 +45,8 @@ module Xliff
 
     # Find a given file by name
     #
+    # If two files exist with the same name, only the first will be returned.
+    #
     # @param [String] name The name of the file to locate. If found it is returned.
     # @example Look up an existing file
     #   # Bundle contains two files: [foo.txt, bar.txt]
@@ -54,8 +56,8 @@ module Xliff
     #   bundle.file_named('baz.txt') => nil
     # @return [File, nil] The file, if found.
     def file_named(name)
-      @files.select do |file|
-        File.basename(file.original) == name
+      @files.find do |file|
+        file.original == name || ::File.basename(f.original) == name
       end
     end
 
