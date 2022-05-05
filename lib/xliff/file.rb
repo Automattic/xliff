@@ -72,6 +72,16 @@ module Xliff
       @entries << entry
     end
 
+    # Find the first entry with a given `id`, if present
+    #
+    # @param [String] entry The `id` to search for.
+    # @return [Xliff::Entry, nil]
+    def entry_with_id(id)
+      @entries.find do |entry|
+        entry.id == id
+      end
+    end
+
     # Encode this {File} object as an XLIFF document fragment representing the {File}
     #
     # Also encodes any headers and translation strings as children of the `File` element.
