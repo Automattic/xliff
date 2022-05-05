@@ -48,4 +48,25 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.to_s).to eq xml
     end
   end
+
+  describe '.file_named' do
+    it 'can find a file by its basename' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 'my-file.txt'))
+
+      expect(bundle.file_named('my-file.txt').original).to eq 'my-file.txt'
+    end
+
+    it 'can find a file that uses a URL for its name' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 'example.com/foo/bar/baz'))
+
+      expect(bundle.file_named('example.com/foo/bar/baz').original).to eq 'example.com/foo/bar/baz'
+    end
+
+    it 'returns nil if not found' do
+      bundle = described_class.new
+      expect(bundle.file_named('example.com/foo/bar/baz')).to be_nil
+    end
+  end
 end
