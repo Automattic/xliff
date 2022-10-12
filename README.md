@@ -2,16 +2,6 @@
 
 This gem is for parsing and building `xliff` files.
 
-## Installation
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add xliff
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install xliff
-
 ## Usage
 
 The gem is meant to handle two tasks – reading `xliff` files and creating new ones. 
@@ -58,8 +48,6 @@ In the above example, `xml` reads:
 ## Development
 
 After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rake spec` to run the tests. You can also run `bundle exec console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `xliff.gemspec`, then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
