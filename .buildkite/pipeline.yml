@@ -74,3 +74,20 @@ steps:
       echo "--- :warning: Run Danger"
       bundle exec danger
     plugins: [*docker_plugin_with_danger_token]
+
+  #################
+  # Push to RubyGems
+  #################
+  - label: ":rubygems: Publish to RubyGems"
+    key: "gem-push"
+    if: build.tag != null
+    depends_on:
+     - test
+     - rubocop
+     - danger
+     - lockfile
+    # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
+    # commands written inline) to avoid leaking a key used in the process in clear in the
+    # BUILDKITE_COMMAND environment variable.
+    command: .buildkite/gem-push.sh
+    plugins: [*docker_plugin]
