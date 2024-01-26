@@ -6,6 +6,9 @@ AllCops:
 Metrics/BlockLength:
   AllowedMethods: ['describe']
 
+Gemspec/RequireMFA:
+  Enabled: false
+
 require:
   - rubocop-rspec
   - rubocop-rake

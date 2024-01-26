@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xliff (1.0.0)
+    xliff (1.0.1)
       nokogiri (~> 1.13)
 
 GEM
