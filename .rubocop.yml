@@ -4,7 +4,8 @@ AllCops:
 
 # Don't fail for having too many tests
 Metrics/BlockLength:
-  IgnoredMethods: ['describe']
+  AllowedMethods: ['describe']
 
 require:
   - rubocop-rspec
+  - rubocop-rake

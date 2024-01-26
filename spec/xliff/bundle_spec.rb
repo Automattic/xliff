@@ -24,7 +24,7 @@ RSpec.describe Xliff::Bundle do
   describe '#from_string' do
     it 'reads XML from the given string' do
       xml = sample_file_contents('infoplist-strings.xliff')
-      described_class.from_string(xml)
+      expect(described_class.from_string(xml)).not_to be_nil
     end
 
     it 'returns a bundle object' do
