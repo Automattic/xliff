@@ -51,6 +51,16 @@ steps:
     plugins: [*docker_plugin]
 
   #################
+  # Check Lockfile
+  #################
+  - label: "🧹 Check Lockfile"
+    key: lockfile
+    command: |
+      bundle install
+      bundle check
+    plugins: [*docker_plugin]
+
+  #################
   # Danger
   #################
   - label: "⛔️ Danger"
