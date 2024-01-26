@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'xliff'
-  spec.version = '1.0.0'
+  spec.version = '1.0.1'
   spec.authors = ['Automattic']
   spec.email = ['mobile@automattic.com']
 
@@ -35,5 +35,5 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
-  spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.metadata['rubygems_mfa_required'] = 'false'
 end

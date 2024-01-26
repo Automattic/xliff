@@ -5,6 +5,8 @@ yard-doc
 
 # Build Products
 pkg
+*.gem
+.gem-credentials
 
 # Dependencies
 vendor
