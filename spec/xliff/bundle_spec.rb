@@ -30,6 +30,11 @@ RSpec.describe Xliff::Bundle do
       bundle.add_file(new_file)
       expect(bundle.to_s).to include('xliff-core-1.2-transitional.xsd')
     end
+
+    it 'preserves a schemaLocation declared under a non-`xsi` namespace prefix' do
+      bundle = described_class.from_string(sample_file_contents('non-xsi-schema-prefix.xliff'))
+      expect(bundle.schema_location).to include('xliff-core-1.2-strict.xsd')
+    end
   end
 
   describe '#from_path' do
@@ -79,8 +84,8 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.to_s).to eq xml
     end
 
-    it 'still emits an `<xliff>` root element when the bundle has no files' do
-      expect(described_class.new.to_xml.root&.name).to eq('xliff')
+    it 'raises rather than emit a file-less `<xliff>` (the schema requires at least one `<file>`)' do
+      expect { described_class.new.to_xml }.to raise_error(/at least one/)
     end
   end
 
@@ -111,13 +116,6 @@ RSpec.describe Xliff::Bundle do
       bundle.add_file(new_file(original: 'Resources/en.lproj/InfoPlist.strings'))
 
       expect(bundle.file_named('Missing.strings')).to be_nil
-    end
-
-    it 'returns nil without raising when a file has a nil original' do
-      bundle = described_class.new
-      bundle.add_file(new_file(original: nil))
-
-      expect(bundle.file_named('anything.strings')).to be_nil
     end
 
     it 'returns nil if not found' do

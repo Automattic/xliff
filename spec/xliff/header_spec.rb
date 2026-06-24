@@ -14,6 +14,10 @@ RSpec.describe Xliff::Header do
       expect { described_class.new(element: 'bad name') }.to raise_error(/Invalid Header element name/)
     end
 
+    it 'coerces a non-string element so it serializes cleanly instead of raising' do
+      expect(described_class.new(element: :tool).to_s).to eq '<tool/>'
+    end
+
     it 'properly stores the attributes' do
       expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes[:key]).to eq 'value'
     end
@@ -64,6 +68,10 @@ RSpec.describe Xliff::Header do
     it 'preserves a namespaced attribute on parse' do
       header = described_class.from_xml(parse_xml('<note xml:lang="en" foo="bar"/>'))
       expect(header.attributes).to eq('xml:lang' => 'en', 'foo' => 'bar')
+    end
+
+    it 'accepts a Unicode element name (a valid XML name) on parse' do
+      expect(described_class.from_xml(parse_xml('<café tool-id="x"/>')).element).to eq 'café'
     end
   end
 

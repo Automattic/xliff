@@ -11,6 +11,13 @@ module Xliff
     # @return [Array<Header>]
     attr_reader :entries
 
+    # `<body>` children the library does not model (e.g. `<group>`, `<bin-unit>`)
+    #
+    # Captured verbatim from the source document on parse and re-emitted on write, so their nested content
+    # survives a round-trip even though it is not parsed into {#entries}.
+    # @return [Array<Nokogiri::XML::Node>]
+    attr_reader :unparsed_body_nodes
+
     # The file's name in the original project (used for reference when translating)
     # @return [String]
     attr_reader :original
@@ -38,19 +45,24 @@ module Xliff
     #
     # Most often used to build an XLIFF file by hand.
     #
-    # @param [String] original The original file name.
-    # @param [String] source_language The locale code for the source language.
+    # @param [String] original The original file name. Required by XLIFF 1.2; must not be empty.
+    # @param [String] source_language The locale code for the source language. Required; must not be empty.
     # @param [String, nil] target_language The locale code for the translated language. Optional in XLIFF 1.2,
-    #   so it defaults to `nil` and no `target-language` attribute is emitted when absent.
-    # @param [String] datatype The type of data represented.
+    #   so an absent (or empty) value becomes `nil` and no `target-language` attribute is emitted.
+    # @param [String] datatype The type of data represented. An absent (or empty) value defaults to `plaintext`.
+    # @raise [ArgumentError] If `original` or `source_language` is empty.
     def initialize(original:, source_language:, target_language: nil, datatype: 'plaintext')
+      raise ArgumentError, 'File `original` must not be empty' if original.to_s.empty?
+      raise ArgumentError, 'File `source-language` must not be empty' if source_language.to_s.empty?
+
       @original = original
       @source_language = source_language
-      @target_language = target_language
-      @datatype = datatype
+      @target_language = target_language.to_s.empty? ? nil : target_language
+      @datatype = datatype.to_s.empty? ? 'plaintext' : datatype
 
       @headers = []
       @entries = []
+      @unparsed_body_nodes = []
     end
 
     # Add arbitrary header data to the file
@@ -75,9 +87,10 @@ module Xliff
 
     # Find the first entry with a given `id`, if present
     #
-    # @param [String] entry The `id` to search for.
+    # @param [#to_s] id The `id` to search for. Coerced to a `String` to match how {Entry} stores its `id`.
     # @return [Xliff::Entry, nil]
     def entry_with_id(id)
+      id = id.to_s
       @entries.find do |entry|
         entry.id == id
       end
@@ -122,7 +135,7 @@ module Xliff
         original: xml['original'],
         source_language: xml['source-language'],
         target_language: xml['target-language'],
-        datatype: xml['datatype'] || 'plaintext'
+        datatype: xml['datatype']
       )
 
       import_file_header(xml, file)
@@ -141,6 +154,10 @@ module Xliff
       raise 'File XML is nil' if xml.nil?
       raise "Invalid File XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid File XML – the root node must be `<file>`' if xml.name != 'file'
+
+      %w[original source-language].each do |attr|
+        raise "Invalid File XML – `<file>` is missing the required `#{attr}` attribute" if xml[attr].to_s.empty?
+      end
     end
 
     # Import File Header Tags from given XML
@@ -166,11 +183,12 @@ module Xliff
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_body(xml, file)
-      return if xml.at('body').nil?
+      body = xml.at('body')
+      return if body.nil?
 
-      xml.at('body').element_children
-         .select { |node| node.name == 'trans-unit' }
-         .each { |node| file.add_entry Entry.from_xml(node) }
+      trans_units, others = body.element_children.partition { |node| node.name == 'trans-unit' }
+      trans_units.each { |node| file.add_entry(Entry.from_xml(node)) }
+      file.unparsed_body_nodes.concat(others)
     end
 
     private
@@ -192,7 +210,8 @@ module Xliff
     # Encode the file's translation entries into their XML representation
     #
     # `<body>` is required by the XLIFF schema even when a file has no entries, so an empty `<body>` is always
-    # emitted (unlike the optional `<header>`).
+    # emitted (unlike the optional `<header>`). Any unmodeled `<body>` children captured on parse
+    # ({#unparsed_body_nodes}) are re-emitted after the entries so they survive a round-trip.
     #
     # @api private
     # @return [void]
@@ -200,6 +219,9 @@ module Xliff
       body = Nokogiri::XML::Node.new('body', fragment.document)
       @entries.each do |entry|
         body.add_child(entry.to_xml)
+      end
+      @unparsed_body_nodes.each do |preserved|
+        body.add_child(preserved.dup)
       end
       node.add_child(body)
     end

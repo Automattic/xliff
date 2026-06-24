@@ -25,6 +25,14 @@ RSpec.describe Xliff::Entry do
     it 'coerces the id to a String' do
       expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
     end
+
+    it 'rejects a nil id' do
+      expect { described_class.new(id: nil, source: 'source') }.to raise_error(ArgumentError, /must not be empty/)
+    end
+
+    it 'rejects an empty id' do
+      expect { described_class.new(id: '', source: 'source') }.to raise_error(ArgumentError, /must not be empty/)
+    end
   end
 
   describe '.id=' do
@@ -38,6 +46,10 @@ RSpec.describe Xliff::Entry do
       entry = new_entry
       entry.id = 5678
       expect(entry.id).to eq('5678')
+    end
+
+    it 'rejects an empty assigned id' do
+      expect { new_entry.id = '' }.to raise_error(ArgumentError, /must not be empty/)
     end
   end
 
@@ -137,8 +149,14 @@ RSpec.describe Xliff::Entry do
     end
 
     it 'raises when the mandatory `id` attribute is missing' do
-      msg = 'Invalid Entry XML – `<trans-unit>` is missing the required `id` attribute'
+      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute'
       expect { described_class.from_xml(parse_xml('<trans-unit><source>S</source></trans-unit>')) }
+        .to raise_exception msg
+    end
+
+    it 'raises when the `id` attribute is present but empty' do
+      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute'
+      expect { described_class.from_xml(parse_xml('<trans-unit id=""><source>S</source></trans-unit>')) }
         .to raise_exception msg
     end
 
@@ -179,6 +197,22 @@ RSpec.describe Xliff::Entry do
       end
     end
 
+    # `<alt-trans>` holds alternative translations; its nested `<source>`/`<target>`/`<note>` must not be
+    # mistaken for the trans-unit's own direct children.
+    context 'when the trans-unit contains an `<alt-trans>`' do
+      it 'ignores an `<alt-trans>` target/note on an untranslated unit' do
+        xml = parse_xml('<trans-unit id="x"><source>Hello</source>' \
+                        '<alt-trans><target>Alt</target><note>AltNote</note></alt-trans></trans-unit>')
+        expect(described_class.from_xml(xml)).to have_attributes(target: nil, note: nil)
+      end
+
+      it 'parses the trans-unit\'s own target, not the `<alt-trans>` target' do
+        xml = parse_xml('<trans-unit id="x"><source>Hello</source><target>Real</target>' \
+                        '<alt-trans><target>Alt</target></alt-trans></trans-unit>')
+        expect(described_class.from_xml(xml).target).to eq 'Real'
+      end
+    end
+
     it 'parses a nil `note` when the `<note>` element is absent' do
       xml = parse_xml('<trans-unit id="x"><source>Hello</source><target>Bonjour</target></trans-unit>')
       expect(described_class.from_xml(xml).note).to be_nil
@@ -186,6 +220,11 @@ RSpec.describe Xliff::Entry do
 
     it 'defaults a missing `xml:space` to "default"' do
       xml = parse_xml('<trans-unit id="x"><source>Hello</source></trans-unit>')
+      expect(described_class.from_xml(xml).xml_space).to eq('default')
+    end
+
+    it 'defaults an empty `xml:space` to "default"' do
+      xml = parse_xml('<trans-unit id="x" xml:space=""><source>Hello</source></trans-unit>')
       expect(described_class.from_xml(xml).xml_space).to eq('default')
     end
   end

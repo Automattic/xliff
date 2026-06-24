@@ -37,6 +37,11 @@ module Xliff
     DEFAULT_SCHEMA_LOCATION = 'urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-transitional.xsd'
     private_constant :DEFAULT_SCHEMA_LOCATION
 
+    # The XML Schema instance namespace. Used to locate the `schemaLocation` declaration by namespace rather
+    # than by a hard-coded `xsi:` prefix, so a document that binds it to a different prefix is still preserved.
+    XSI_NAMESPACE = 'http://www.w3.org/2001/XMLSchema-instance'
+    private_constant :XSI_NAMESPACE
+
     # Create a blank {Bundle} object, suitable for building an XLIFF file by hand
     #
     # @param [String] path An optional path to where the file should be stored on disk.
@@ -76,14 +81,18 @@ module Xliff
     # @return [File, nil] The file, if found.
     def file_named(name)
       @files.find do |file|
-        file.original == name || (file.original && ::File.basename(file.original) == name)
+        file.original == name || ::File.basename(file.original) == name
       end
     end
 
     # Encode this {Bundle} object as an XLIFF document
     #
+    # @raise [RuntimeError] If the bundle has no files; XLIFF requires at least one `<file>`, so a file-less
+    #   bundle has no valid serialization. (Reading a file-less `<xliff>` is still tolerated.)
     # @return [Nokogiri::XML::Document]
     def to_xml
+      raise 'Cannot serialize a Bundle with no files – XLIFF requires at least one `<file>`' if @files.empty?
+
       document = Nokogiri::XML::Document.new
       document.encoding = 'UTF-8'
 
@@ -143,7 +152,8 @@ module Xliff
       root = xml.document.root
       raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
 
-      bundle = Bundle.new(schema_location: root['xsi:schemaLocation'] || DEFAULT_SCHEMA_LOCATION)
+      declared_schema = root.attribute_with_ns('schemaLocation', XSI_NAMESPACE)&.value
+      bundle = Bundle.new(schema_location: declared_schema || DEFAULT_SCHEMA_LOCATION)
       import_files(root, bundle)
 
       bundle
@@ -170,7 +180,7 @@ module Xliff
     # @return [void]
     def attach_xliff_metadata(node)
       node['xmlns'] = 'urn:oasis:names:tc:xliff:document:1.2'
-      node['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
+      node['xmlns:xsi'] = XSI_NAMESPACE
       node['version'] = '1.2'
       node['xsi:schemaLocation'] = @schema_location
     end

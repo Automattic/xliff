@@ -52,14 +52,16 @@ In the above example, `xml` reads:
 
 ## Conformance and limitations
 
-Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas. The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved verbatim from the source document when round-tripping, so reading and re-writing a file leaves it byte-for-byte unchanged.
+Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas. The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved from the source document when round-tripping. For a document that already declares the standard XLIFF 1.2 root attributes – as Xcode's exports do – reading and re-writing it is byte-for-byte unchanged.
 
 A few things worth knowing:
 
 - **Untranslated strings** parse with a `nil` `target` (and `note`); both elements are omitted on write.
-- **`Xliff::Header` models an element name and its attributes only** – a header's text content and any nested child elements are not preserved on round-trip.
+- **`Xliff::Header` models an element name and its attributes only** – a header's text content and any nested child elements are not preserved on round-trip. Likewise, non-`xml:` namespace prefixes (on the element name or its attributes) aren't preserved; see [#18](https://github.com/Automattic/xliff/issues/18).
 - **`source`, `target`, and `note` are plain text.** Inline XLIFF markup (`<g>`, `<ph>`, …) inside them is flattened to its text, and only the first `<note>` on a `<trans-unit>` is retained.
+- **`<group>` and `<bin-unit>` are preserved, not parsed.** They round-trip verbatim (and are available as `Xliff::File#unparsed_body_nodes`), but the library doesn't model them or expose their nested `<trans-unit>`s as entries. First-class support is tracked in [#17](https://github.com/Automattic/xliff/issues/17).
 - **Attribute values aren't validated against the schema's enumerations** – an out-of-range `datatype`, `xml:space`, or language code is serialized as given.
+- **Byte-identical round-trip assumes a standard root.** The `<xliff>` element is always re-emitted with `xmlns`, `xmlns:xsi`, `version`, and `xsi:schemaLocation`; a source that omits any of these, or declares the schema-instance namespace under a non-`xsi` prefix, is normalized to that form. Preserving an arbitrary root verbatim is tracked in [#16](https://github.com/Automattic/xliff/issues/16).
 
 ## Development
 

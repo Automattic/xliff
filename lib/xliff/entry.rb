@@ -40,22 +40,27 @@ module Xliff
     # @param [String] note Documentation for translators understand the context of a string.
     # @param [String] xml_space The XML whitespace processing behaviour.
     def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
-      @id = id&.to_s
+      self.id = id
       @source = source
       @target = target
       @note = note
-      @xml_space = xml_space
+      @xml_space = xml_space.to_s.empty? ? 'default' : xml_space
     end
 
     # Set the unique identifier, coercing the value to a `String`
     #
     # XML attributes are always strings, so coercing here keeps `id` consistent whether it was built by hand
-    # (e.g. with an integer) or parsed back from a document.
+    # (e.g. with an integer) or parsed back from a document. An empty `id` is rejected: it is meaningless and
+    # every empty-id entry would collide under {File#entry_with_id}.
     #
     # @param [#to_s] value The new identifier.
+    # @raise [ArgumentError] If the coerced value is empty.
     # @return [void]
     def id=(value)
-      @id = value&.to_s
+      coerced = value.to_s
+      raise ArgumentError, 'Entry `id` must not be empty' if coerced.empty?
+
+      @id = coerced
     end
 
     # Encode this `Entry` object to an Nokogiri XML Element Representation of a `<trans-unit>` element
@@ -91,10 +96,10 @@ module Xliff
 
       Entry.new(
         id: xml['id'],
-        source: xml.at('source').content,
-        target: xml.at('target')&.content,
-        note: xml.at('note')&.content,
-        xml_space: xml['xml:space'] || 'default'
+        source: direct_child(xml, 'source')&.content,
+        target: direct_child(xml, 'target')&.content,
+        note: direct_child(xml, 'note')&.content,
+        xml_space: xml['xml:space']
       )
     end
 
@@ -105,8 +110,22 @@ module Xliff
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
-      raise 'Invalid Entry XML – `<trans-unit>` is missing the required `id` attribute' if xml['id'].nil?
-      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if xml.at('source').nil?
+      raise 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute' if xml['id'].to_s.empty?
+      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if direct_child(xml, 'source').nil?
+    end
+
+    # The first direct child element with the given (local) name, or nil.
+    #
+    # Matches by local name (namespace-agnostic, like the rest of the parser) and only considers direct
+    # children, so a nested `<alt-trans>`/`<group>` subtree can't be mistaken for the trans-unit's own
+    # `<source>`/`<target>`/`<note>`.
+    #
+    # @api private
+    # @param [Nokogiri::XML::Element] xml The `<trans-unit>` element.
+    # @param [String] name The local element name to find.
+    # @return [Nokogiri::XML::Element, nil]
+    private_class_method def self.direct_child(xml, name)
+      xml.element_children.find { |node| node.name == name }
     end
   end
 end
