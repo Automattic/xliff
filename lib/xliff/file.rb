@@ -40,9 +40,10 @@ module Xliff
     #
     # @param [String] original The original file name.
     # @param [String] source_language The locale code for the source language.
-    # @param [String] target_language The locale code for the translated language.
+    # @param [String, nil] target_language The locale code for the translated language. Optional in XLIFF 1.2,
+    #   so it defaults to `nil` and no `target-language` attribute is emitted when absent.
     # @param [String] datatype The type of data represented.
-    def initialize(original:, source_language:, target_language:, datatype: 'plaintext')
+    def initialize(original:, source_language:, target_language: nil, datatype: 'plaintext')
       @original = original
       @source_language = source_language
       @target_language = target_language
@@ -92,7 +93,7 @@ module Xliff
       file_node = fragment.document.create_element('file')
       file_node['original'] = @original
       file_node['source-language'] = @source_language
-      file_node['target-language'] = @target_language
+      file_node['target-language'] = @target_language unless @target_language.nil?
       file_node['datatype'] = @datatype
 
       add_headers_to_file(fragment, file_node)
@@ -121,7 +122,7 @@ module Xliff
         original: xml['original'],
         source_language: xml['source-language'],
         target_language: xml['target-language'],
-        datatype: xml['datatype'] || nil
+        datatype: xml['datatype'] || 'plaintext'
       )
 
       import_file_header(xml, file)
@@ -167,7 +168,9 @@ module Xliff
     private_class_method def self.import_file_body(xml, file)
       return if xml.at('body').nil?
 
-      xml.at('body').element_children.each { |node| file.add_entry Entry.from_xml(node) }
+      xml.at('body').element_children
+         .select { |node| node.name == 'trans-unit' }
+         .each { |node| file.add_entry Entry.from_xml(node) }
     end
 
     private

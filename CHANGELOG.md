@@ -5,6 +5,10 @@
 - `Xliff::Bundle#to_xml`/`#to_s` now emit the `<xliff>` root element even when the bundle has no files. An
   empty bundle previously serialized to just an XML declaration with no root element, which is not even
   well-formed XLIFF.
+- `target-language` is now optional on `Xliff::File` and omitted from output when absent. It is an optional
+  attribute in XLIFF 1.2, but round-tripping a `<file>` that omitted it previously emitted
+  `target-language=""`, which is invalid (`xsd:language` rejects the empty string) — turning schema-valid
+  input into schema-invalid output.
 
 - Parse Xcode exports for locales that aren't translated yet. `Xliff::Entry.from_xml` previously crashed
   (`NoMethodError`) on `<trans-unit>` elements with no `<target>` — the shape Xcode emits for untranslated

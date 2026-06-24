@@ -83,6 +83,16 @@ RSpec.describe Xliff::File do
       expect(described_class.from_xml(xml).datatype).to eq('plaintext')
     end
 
+    it 'parses a nil `target-language` when the attribute is absent (it is optional)' do
+      xml = parse_xml('<file original="x" source-language="en" datatype="plaintext"><body/></file>')
+      expect(described_class.from_xml(xml).target_language).to be_nil
+    end
+
+    it 'does not re-emit `target-language` when the source omitted it' do
+      xml = parse_xml('<file original="x" source-language="en" datatype="plaintext"><body/></file>')
+      expect(described_class.from_xml(xml).to_xml['target-language']).to be_nil
+    end
+
     it 'correctly parses file with missing header tag' do
       expect(described_class.from_xml(sample_file_xml('fragment-empty-file.xml')).headers).to be_empty
     end
@@ -117,6 +127,10 @@ RSpec.describe Xliff::File do
 
       it 'has the correct `target-language` attribute' do
         expect(new_file(target_language: 'fr').to_xml['target-language']).to eq 'fr'
+      end
+
+      it 'omits the `target-language` attribute when target_language is nil' do
+        expect(described_class.new(original: 'a', source_language: 'en').to_xml['target-language']).to be_nil
       end
 
       it 'has the correct `datatype` attribute' do
