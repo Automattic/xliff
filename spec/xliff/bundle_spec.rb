@@ -85,6 +85,13 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.file_named('Missing.strings')).to be_nil
     end
 
+    it 'returns nil without raising when a file has a nil original' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: nil))
+
+      expect(bundle.file_named('anything.strings')).to be_nil
+    end
+
     it 'returns nil if not found' do
       bundle = described_class.new
       expect(bundle.file_named('example.com/foo/bar/baz')).to be_nil

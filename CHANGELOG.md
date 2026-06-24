@@ -9,6 +9,8 @@
   unchanged.
 - `Xliff::Bundle#file_named` no longer raises `NameError` when matching a file by basename (e.g. looking up
   `InfoPlist.strings` against an Xcode `original` path of `Resources/en.lproj/InfoPlist.strings`).
+- `Xliff::Bundle#file_named` no longer raises `TypeError` when the bundle contains a file with a `nil`
+  `original` (e.g. a `<file>` parsed without the `original` attribute); such a file is simply skipped.
 
 ## [0.1.0] - 2022-04-23
 
