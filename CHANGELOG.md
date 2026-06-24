@@ -12,6 +12,11 @@
 - `Xliff::File` now always emits a `<body>` element, even when it has no entries. `<body>` is required by the
   XLIFF schema (an empty one is legal), but a file with no entries previously omitted it entirely, producing
   schema-invalid output. The optional `<header>` is still omitted when empty.
+- `Xliff::Bundle` no longer overwrites a parsed document's declared `xsi:schemaLocation`. It now preserves the
+  source document's value on round-trip (keeping output byte-identical) and exposes it via a new
+  `schema_location` accessor. Bundles built from scratch default to the XLIFF 1.2 **transitional** schema
+  rather than strict, since the library round-trips real-world content (e.g. Xcode's `<tool build-num>`) that
+  only the transitional schema accepts — so the declared schema no longer over-claims strict conformance.
 
 - Parse Xcode exports for locales that aren't translated yet. `Xliff::Entry.from_xml` previously crashed
   (`NoMethodError`) on `<trans-unit>` elements with no `<target>` — the shape Xcode emits for untranslated

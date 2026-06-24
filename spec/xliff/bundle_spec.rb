@@ -13,6 +13,23 @@ RSpec.describe Xliff::Bundle do
     it 'contains no files' do
       expect(described_class.new.files).to be_empty
     end
+
+    it 'defaults the schema_location to the XLIFF 1.2 transitional schema' do
+      expect(described_class.new.schema_location).to include('xliff-core-1.2-transitional.xsd')
+    end
+  end
+
+  describe '.schema_location' do
+    it 'preserves the schemaLocation declared by the source document on round-trip' do
+      bundle = described_class.from_string(sample_file_contents('infoplist-strings.xliff'))
+      expect(bundle.to_s).to include('xliff-core-1.2-strict.xsd')
+    end
+
+    it 'declares the transitional schema for a bundle built from scratch' do
+      bundle = described_class.new
+      bundle.add_file(new_file)
+      expect(bundle.to_s).to include('xliff-core-1.2-transitional.xsd')
+    end
   end
 
   describe '#from_path' do

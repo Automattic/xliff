@@ -20,15 +20,34 @@ module Xliff
     #   "bundle.path" #=> /tmp/foo.xliff
     attr_accessor :path
 
+    # The `xsi:schemaLocation` declared on the `<xliff>` root
+    #
+    # Preserved verbatim from the source document when parsing, and defaulting to the XLIFF 1.2 transitional
+    # schema for bundles built from scratch.
+    # @!attribute [rw] schema_location
+    # @return [String]
+    # @api public
+    # @example Retrieve the schema location
+    #   "bundle.schema_location" #=> "urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/..."
+    attr_accessor :schema_location
+
+    # The default `xsi:schemaLocation` for bundles built from scratch: XLIFF 1.2 transitional, not strict,
+    # because the library round-trips real-world content (e.g. Xcode's `<tool build-num>`) that only the
+    # transitional schema accepts. A parsed bundle keeps whatever its source document declared instead.
+    DEFAULT_SCHEMA_LOCATION = 'urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-transitional.xsd'
+    private_constant :DEFAULT_SCHEMA_LOCATION
+
     # Create a blank {Bundle} object, suitable for building an XLIFF file by hand
     #
     # @param [String] path An optional path to where the file should be stored on disk.
+    # @param [String] schema_location The `xsi:schemaLocation` to declare. Defaults to XLIFF 1.2 transitional.
     # @example Create an empty XLIFF bundle
     #   bundle.new
     # @example Create an empty XLIFF bundle with a pre-specified path
     #   bundle.new(path: /path/to/my/output/file.xliff)
-    def initialize(path: nil)
+    def initialize(path: nil, schema_location: DEFAULT_SCHEMA_LOCATION)
       @path = path
+      @schema_location = schema_location
       @files = []
     end
 
@@ -124,13 +143,22 @@ module Xliff
       root = xml.document.root
       raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
 
-      bundle = Bundle.new
+      bundle = Bundle.new(schema_location: root['xsi:schemaLocation'] || DEFAULT_SCHEMA_LOCATION)
+      import_files(root, bundle)
 
+      bundle
+    end
+
+    # Parse each `<file>` child of the `<xliff>` root into the bundle, skipping any other elements.
+    #
+    # @api private
+    # @param [Nokogiri::XML::Element] root The `<xliff>` root node.
+    # @param [Bundle] bundle The {Bundle} being built.
+    # @return [void]
+    private_class_method def self.import_files(root, bundle)
       root.element_children
           .select { |node| node.name == 'file' }
           .each { |node| bundle.add_file File.from_xml(node) }
-
-      bundle
     end
 
     private
@@ -144,7 +172,7 @@ module Xliff
       node['xmlns'] = 'urn:oasis:names:tc:xliff:document:1.2'
       node['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
       node['version'] = '1.2'
-      node['xsi:schemaLocation'] = 'urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd'
+      node['xsi:schemaLocation'] = @schema_location
     end
   end
 end
