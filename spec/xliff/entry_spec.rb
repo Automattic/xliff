@@ -17,6 +17,10 @@ RSpec.describe Xliff::Entry do
     it 'properly stores the note' do
       expect(new_entry(note: 'note').note).to eq 'note'
     end
+
+    it 'defaults the target to nil for strings that are not yet translated' do
+      expect(described_class.new(id: 'x', source: 'Hello').target).to be_nil
+    end
   end
 
   describe '.id=' do
@@ -88,6 +92,14 @@ RSpec.describe Xliff::Entry do
       it 'has the correct `note` value if provided' do
         expect(new_entry(note: 'test').to_xml.at('note').content).to eq 'test'
       end
+
+      it 'omits the `target` element when the target is nil' do
+        expect(described_class.new(id: 'x', source: 'Hello', note: 'ctx').to_xml.at('target')).to be_nil
+      end
+
+      it 'keeps the `target` element when the target is an empty string' do
+        expect(described_class.new(id: 'x', source: 'Hello', target: '').to_xml.at('target')).not_to be_nil
+      end
     end
   end
 
@@ -127,11 +139,39 @@ RSpec.describe Xliff::Entry do
     it 'parses the `xml:space` declaration correctly' do
       expect(valid_entry.xml_space).to eq 'preserve'
     end
+
+    # Xcode omits `<target>` entirely for strings in a locale that hasn't been translated yet.
+    context 'when the entry is untranslated (no `<target>` element)' do
+      let(:untranslated) { described_class.from_xml(sample_file_xml('fragment-trans-unit-untranslated.xml')) }
+
+      it 'parses the `source` correctly' do
+        expect(untranslated.source).to eq 'WooCommerce'
+      end
+
+      it 'parses a nil `target`' do
+        expect(untranslated.target).to be_nil
+      end
+
+      it 'parses the `note` correctly' do
+        expect(untranslated.note).to eq 'Bundle name'
+      end
+    end
+
+    it 'parses a nil `note` when the `<note>` element is absent' do
+      xml = parse_xml('<trans-unit id="x"><source>Hello</source><target>Bonjour</target></trans-unit>')
+      expect(described_class.from_xml(xml).note).to be_nil
+    end
   end
 
   describe '.to_s' do
     it 'matches the input exactly' do
       contents = sample_file_contents('fragment-trans-unit.xml').strip
+      xml = Nokogiri::XML(contents).document.root
+      expect(described_class.from_xml(xml).to_s).to eq contents
+    end
+
+    it 'round-trips an untranslated entry without inventing a `<target>`' do
+      contents = sample_file_contents('fragment-trans-unit-untranslated.xml').strip
       xml = Nokogiri::XML(contents).document.root
       expect(described_class.from_xml(xml).to_s).to eq contents
     end

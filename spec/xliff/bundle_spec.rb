@@ -47,6 +47,13 @@ RSpec.describe Xliff::Bundle do
 
       expect(bundle.to_s).to eq xml
     end
+
+    it 'round-trips an Xcode export containing untranslated strings' do
+      xml = sample_file_contents('xcode-untranslated.xliff')
+      bundle = described_class.from_string(xml)
+
+      expect(bundle.to_s).to eq xml
+    end
   end
 
   describe '.file_named' do
@@ -62,6 +69,20 @@ RSpec.describe Xliff::Bundle do
       bundle.add_file(new_file(original: 'example.com/foo/bar/baz'))
 
       expect(bundle.file_named('example.com/foo/bar/baz').original).to eq 'example.com/foo/bar/baz'
+    end
+
+    it 'can find a file by its basename when the original is an Xcode-style path' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 'Resources/en.lproj/InfoPlist.strings'))
+
+      expect(bundle.file_named('InfoPlist.strings').original).to eq 'Resources/en.lproj/InfoPlist.strings'
+    end
+
+    it 'returns nil without raising when a full-path file does not match' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 'Resources/en.lproj/InfoPlist.strings'))
+
+      expect(bundle.file_named('Missing.strings')).to be_nil
     end
 
     it 'returns nil if not found' do

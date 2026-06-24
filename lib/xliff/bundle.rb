@@ -57,7 +57,7 @@ module Xliff
     # @return [File, nil] The file, if found.
     def file_named(name)
       @files.find do |file|
-        file.original == name || ::File.basename(f.original) == name
+        file.original == name || ::File.basename(file.original) == name
       end
     end
 

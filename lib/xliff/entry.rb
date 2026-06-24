@@ -35,10 +35,11 @@ module Xliff
     #
     # @param [String] id A unique identifier for this string.
     # @param [String] source The original text.
-    # @param [String] target The translated text.
+    # @param [String, nil] target The translated text. Omitted by Xcode for strings that haven't been translated
+    #   yet, so it defaults to `nil` and no `<target>` element is emitted when absent.
     # @param [String] note Documentation for translators understand the context of a string.
     # @param [String] xml_space The XML whitespace processing behaviour.
-    def initialize(id:, source:, target:, note: nil, xml_space: 'default')
+    def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
       @id = id
       @source = source
       @target = target
@@ -56,11 +57,8 @@ module Xliff
       trans_unit_node['xml:space'] = @xml_space
 
       trans_unit_node.add_leaf_node(element: 'source', content: @source)
-      trans_unit_node.add_leaf_node(element: 'target', content: @target)
-
-      return trans_unit_node if @note.nil?
-
-      trans_unit_node.add_leaf_node(element: 'note', content: @note)
+      trans_unit_node.add_leaf_node(element: 'target', content: @target) unless @target.nil?
+      trans_unit_node.add_leaf_node(element: 'note', content: @note) unless @note.nil?
 
       trans_unit_node
     end
@@ -82,9 +80,9 @@ module Xliff
 
       Entry.new(
         id: xml['id'],
-        source: xml.at('source').content,
-        target: xml.at('target').content,
-        note: xml.at('note').content || nil,
+        source: xml.at('source')&.content,
+        target: xml.at('target')&.content,
+        note: xml.at('note')&.content,
         xml_space: xml['xml:space']
       )
     end
