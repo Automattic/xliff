@@ -78,6 +78,11 @@ RSpec.describe Xliff::File do
       expect(valid_file.datatype).to eq 'plaintext'
     end
 
+    it 'defaults a missing `datatype` to plaintext' do
+      xml = parse_xml('<file original="x" source-language="en" target-language="fr"><body/></file>')
+      expect(described_class.from_xml(xml).datatype).to eq('plaintext')
+    end
+
     it 'correctly parses file with missing header tag' do
       expect(described_class.from_xml(sample_file_xml('fragment-empty-file.xml')).headers).to be_empty
     end

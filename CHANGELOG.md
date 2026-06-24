@@ -16,6 +16,8 @@
   filtered), preserving the `<trans-unit>` siblings the library understands.
 - `Xliff::Bundle.from_string`/`from_path` now raise the documented `Invalid XLIFF file` error for empty,
   whitespace-only, or otherwise root-less input instead of leaking an internal `NoMethodError`.
+- A `<file>` parsed without a `datatype` attribute now falls back to the documented `plaintext` default
+  instead of becoming `nil` and serializing to an invalid `datatype=""`.
 
 ## [0.1.0] - 2022-04-23
 

@@ -121,7 +121,7 @@ module Xliff
         original: xml['original'],
         source_language: xml['source-language'],
         target_language: xml['target-language'],
-        datatype: xml['datatype'] || nil
+        datatype: xml['datatype'] || 'plaintext'
       )
 
       import_file_header(xml, file)
