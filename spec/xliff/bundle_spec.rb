@@ -30,6 +30,13 @@ RSpec.describe Xliff::Bundle do
     it 'returns a bundle object' do
       expect(described_class.from_string(sample_file_contents('infoplist-strings.xliff'))).to be_a described_class
     end
+
+    it 'raises a clear error for empty or root-less input' do
+      ['', '   ', '<?xml version="1.0"?>', '<!-- comment -->'].each do |input|
+        expect { described_class.from_string(input) }
+          .to raise_error('Invalid XLIFF file – the root node must be `<xliff>`')
+      end
+    end
   end
 
   describe '.path=' do

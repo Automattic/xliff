@@ -14,6 +14,8 @@
 - Parsing a `<file>` whose `<body>` contains a schema-valid `<group>` or `<bin-unit>` element no longer
   crashes the whole parse. Non-`<trans-unit>` children are now skipped (mirroring how `<xliff>` children are
   filtered), preserving the `<trans-unit>` siblings the library understands.
+- `Xliff::Bundle.from_string`/`from_path` now raise the documented `Invalid XLIFF file` error for empty,
+  whitespace-only, or otherwise root-less input instead of leaking an internal `NoMethodError`.
 
 ## [0.1.0] - 2022-04-23
 

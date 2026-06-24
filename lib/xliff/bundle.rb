@@ -123,13 +123,14 @@ module Xliff
     def self.from_xml(xml)
       raise if xml.nil?
 
-      raise 'Invalid XLIFF file – the root node must be `<xliff>`' if xml.document.root.name != 'xliff'
+      root = xml.document.root
+      raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
 
       bundle = Bundle.new
 
-      xml.document.root.element_children
-         .select { |node| node.name == 'file' }
-         .each { |node| bundle.add_file File.from_xml(node) }
+      root.element_children
+          .select { |node| node.name == 'file' }
+          .each { |node| bundle.add_file File.from_xml(node) }
 
       bundle
     end
