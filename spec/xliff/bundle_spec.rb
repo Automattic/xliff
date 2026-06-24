@@ -61,6 +61,10 @@ RSpec.describe Xliff::Bundle do
 
       expect(bundle.to_s).to eq xml
     end
+
+    it 'still emits an `<xliff>` root element when the bundle has no files' do
+      expect(described_class.new.to_xml.root&.name).to eq('xliff')
+    end
   end
 
   describe '.file_named' do

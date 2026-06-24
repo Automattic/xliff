@@ -2,6 +2,10 @@
 
 ### Fixed
 
+- `Xliff::Bundle#to_xml`/`#to_s` now emit the `<xliff>` root element even when the bundle has no files. An
+  empty bundle previously serialized to just an XML declaration with no root element, which is not even
+  well-formed XLIFF.
+
 - Parse Xcode exports for locales that aren't translated yet. `Xliff::Entry.from_xml` previously crashed
   (`NoMethodError`) on `<trans-unit>` elements with no `<target>` — the shape Xcode emits for untranslated
   strings — and on entries with no `<note>`. `target` is now an optional argument, absent `<target>`/`<note>`
