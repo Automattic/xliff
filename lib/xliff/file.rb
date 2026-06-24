@@ -16,6 +16,8 @@ module Xliff
     # Captured verbatim from the source document on parse and re-emitted on write, so their nested content
     # survives a round-trip even though it is not parsed into {#entries}.
     # @return [Array<Nokogiri::XML::Node>]
+    # @example Inspect the preserved (unmodeled) body children
+    #   "file.unparsed_body_nodes.map(&:name)" #=> ["group"]
     attr_reader :unparsed_body_nodes
 
     # The file's name in the original project (used for reference when translating)

@@ -114,7 +114,7 @@ module Xliff
       raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if direct_child(xml, 'source').nil?
     end
 
-    # The first direct child element with the given (local) name, or nil.
+    # The first direct child element with the given (local) name, or nil
     #
     # Matches by local name (namespace-agnostic, like the rest of the parser) and only considers direct
     # children, so a nested `<alt-trans>`/`<group>` subtree can't be mistaken for the trans-unit's own
