@@ -83,7 +83,7 @@ module Xliff
         source: xml.at('source')&.content,
         target: xml.at('target')&.content,
         note: xml.at('note')&.content,
-        xml_space: xml['xml:space']
+        xml_space: xml['xml:space'] || 'default'
       )
     end
 

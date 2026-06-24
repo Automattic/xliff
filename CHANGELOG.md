@@ -18,6 +18,8 @@
   whitespace-only, or otherwise root-less input instead of leaking an internal `NoMethodError`.
 - A `<file>` parsed without a `datatype` attribute now falls back to the documented `plaintext` default
   instead of becoming `nil` and serializing to an invalid `datatype=""`.
+- A `<trans-unit>` parsed without an `xml:space` attribute now falls back to the documented `default` value
+  instead of serializing to an invalid `xml:space=""`.
 
 ## [0.1.0] - 2022-04-23
 

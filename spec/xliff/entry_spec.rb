@@ -161,6 +161,11 @@ RSpec.describe Xliff::Entry do
       xml = parse_xml('<trans-unit id="x"><source>Hello</source><target>Bonjour</target></trans-unit>')
       expect(described_class.from_xml(xml).note).to be_nil
     end
+
+    it 'defaults a missing `xml:space` to "default"' do
+      xml = parse_xml('<trans-unit id="x"><source>Hello</source></trans-unit>')
+      expect(described_class.from_xml(xml).xml_space).to eq('default')
+    end
   end
 
   describe '.to_s' do
