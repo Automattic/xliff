@@ -26,6 +26,9 @@
 - `Xliff::Header.from_xml` now preserves namespaced attributes. A header attribute such as `xml:lang="en"`
   was previously read as `lang=""` (prefix dropped, value erased) because it was looked up by local name;
   attributes are now read from the parsed nodes, keeping both prefix and value.
+- `Xliff::Entry` now coerces its `id` to a `String` (matching the documented type and the README's example of
+  an integer `id`), so `File#entry_with_id` finds an entry consistently before and after a serialize/parse
+  round trip.
 
 ## [0.1.0] - 2022-04-23
 

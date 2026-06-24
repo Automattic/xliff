@@ -40,7 +40,7 @@ module Xliff
     # @param [String] note Documentation for translators understand the context of a string.
     # @param [String] xml_space The XML whitespace processing behaviour.
     def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
-      @id = id
+      @id = id&.to_s
       @source = source
       @target = target
       @note = note

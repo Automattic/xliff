@@ -21,6 +21,10 @@ RSpec.describe Xliff::Entry do
     it 'defaults the target to nil for strings that are not yet translated' do
       expect(described_class.new(id: 'x', source: 'Hello').target).to be_nil
     end
+
+    it 'coerces the id to a String' do
+      expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
+    end
   end
 
   describe '.id=' do
