@@ -121,7 +121,7 @@ module Xliff
         original: xml['original'],
         source_language: xml['source-language'],
         target_language: xml['target-language'],
-        datatype: xml['datatype'] || 'plaintext'
+        datatype: xml['datatype'] || nil
       )
 
       import_file_header(xml, file)
@@ -167,9 +167,7 @@ module Xliff
     private_class_method def self.import_file_body(xml, file)
       return if xml.at('body').nil?
 
-      xml.at('body').element_children
-         .select { |node| node.name == 'trans-unit' }
-         .each { |node| file.add_entry Entry.from_xml(node) }
+      xml.at('body').element_children.each { |node| file.add_entry Entry.from_xml(node) }
     end
 
     private

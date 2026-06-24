@@ -57,7 +57,7 @@ module Xliff
     # @return [File, nil] The file, if found.
     def file_named(name)
       @files.find do |file|
-        file.original == name || (file.original && ::File.basename(file.original) == name)
+        file.original == name || ::File.basename(file.original) == name
       end
     end
 
@@ -123,14 +123,13 @@ module Xliff
     def self.from_xml(xml)
       raise if xml.nil?
 
-      root = xml.document.root
-      raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
+      raise 'Invalid XLIFF file – the root node must be `<xliff>`' if xml.document.root.name != 'xliff'
 
       bundle = Bundle.new
 
-      root.element_children
-          .select { |node| node.name == 'file' }
-          .each { |node| bundle.add_file File.from_xml(node) }
+      xml.document.root.element_children
+         .select { |node| node.name == 'file' }
+         .each { |node| bundle.add_file File.from_xml(node) }
 
       bundle
     end

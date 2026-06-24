@@ -59,7 +59,7 @@ module Xliff
 
       Header.new(
         element: xml.name,
-        attributes: xml.attribute_nodes.to_h { |a| [[a.namespace&.prefix, a.name].compact.join(':'), a.value] }
+        attributes: xml.keys.to_h { |k| [k, xml[k]] }
       )
     end
   end

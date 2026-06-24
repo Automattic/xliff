@@ -11,7 +11,7 @@ module Xliff
     # source translation is not a suitable unique identifier.
     #
     # @return [String]
-    attr_accessor :id
+    attr_reader :id
 
     # The original text
     # @return [String]
@@ -45,6 +45,17 @@ module Xliff
       @target = target
       @note = note
       @xml_space = xml_space
+    end
+
+    # Set the unique identifier, coercing the value to a `String`
+    #
+    # XML attributes are always strings, so coercing here keeps `id` consistent whether it was built by hand
+    # (e.g. with an integer) or parsed back from a document.
+    #
+    # @param [#to_s] value The new identifier.
+    # @return [void]
+    def id=(value)
+      @id = value&.to_s
     end
 
     # Encode this `Entry` object to an Nokogiri XML Element Representation of a `<trans-unit>` element

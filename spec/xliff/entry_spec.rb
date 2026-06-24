@@ -33,6 +33,12 @@ RSpec.describe Xliff::Entry do
       entry.id = '5678'
       expect(entry.id).to eq '5678'
     end
+
+    it 'coerces an assigned id to a String' do
+      entry = new_entry
+      entry.id = 5678
+      expect(entry.id).to eq('5678')
+    end
   end
 
   describe '.source=' do
