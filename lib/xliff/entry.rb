@@ -80,7 +80,7 @@ module Xliff
 
       Entry.new(
         id: xml['id'],
-        source: xml.at('source')&.content,
+        source: xml.at('source').content,
         target: xml.at('target')&.content,
         note: xml.at('note')&.content,
         xml_space: xml['xml:space'] || 'default'
@@ -94,6 +94,7 @@ module Xliff
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
+      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if xml.at('source').nil?
     end
   end
 end

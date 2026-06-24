@@ -20,6 +20,9 @@
   instead of becoming `nil` and serializing to an invalid `datatype=""`.
 - A `<trans-unit>` parsed without an `xml:space` attribute now falls back to the documented `default` value
   instead of serializing to an invalid `xml:space=""`.
+- `Xliff::Entry.from_xml` now raises a clear error for a `<trans-unit>` missing its mandatory `<source>`
+  element, rather than silently parsing it to `nil` and fabricating an empty `<source/>`. The optional
+  `<target>`/`<note>` (which Xcode omits for untranslated strings) remain tolerated.
 
 ## [0.1.0] - 2022-04-23
 

@@ -120,6 +120,12 @@ RSpec.describe Xliff::Entry do
       expect { described_class.from_xml(Nokogiri::XML('<xml />').document.root) }.to raise_exception exp
     end
 
+    it 'raises when the mandatory `<source>` element is missing' do
+      msg = 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element'
+      expect { described_class.from_xml(parse_xml('<trans-unit id="x"><target>T</target></trans-unit>')) }
+        .to raise_exception msg
+    end
+
     it 'parses the `id` correctly' do
       expect(valid_entry.id).to eq 'CFBundleDisplayName'
     end
