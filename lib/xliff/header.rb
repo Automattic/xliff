@@ -7,6 +7,10 @@ module Xliff
   #
   # Headers have an element and a set of key/value pairs encoded as XML attributes.
   class Header
+    # A valid (optionally namespace-prefixed) XML element name.
+    VALID_ELEMENT_NAME = /\A[a-zA-Z_][\w.-]*(?::[a-zA-Z_][\w.-]*)?\z/.freeze
+    private_constant :VALID_ELEMENT_NAME
+
     # This header's element
     # @return [String]
     attr_reader :element
@@ -22,6 +26,8 @@ module Xliff
     # @param [String] element The XML element to use.
     # @param [String: String] attributes Any attributes that should be set on the header.
     def initialize(element:, attributes: {})
+      raise "Invalid Header element name – #{element.inspect}" unless element.to_s.match?(VALID_ELEMENT_NAME)
+
       @element = element
       @attributes = attributes.transform_values(&:to_s)
     end

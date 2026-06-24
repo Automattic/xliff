@@ -10,6 +10,10 @@ RSpec.describe Xliff::Header do
       expect { described_class.new(attributes: { foo: 'bar' }) }.to raise_error(ArgumentError, /element/)
     end
 
+    it 'rejects an element name that is not a valid XML name' do
+      expect { described_class.new(element: 'bad name') }.to raise_error(/Invalid Header element name/)
+    end
+
     it 'properly stores the attributes' do
       expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes[:key]).to eq 'value'
     end

@@ -35,6 +35,9 @@
 - `Xliff::Header.new` now requires its `element:` argument (matching `Xliff::Entry`'s `id:` and
   `Xliff::File`'s `original:`). Building a header without one previously constructed fine and then crashed
   with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.
+- `Xliff::Header.new` now rejects an `element:` that is not a valid XML element name (e.g. one containing a
+  space), which previously serialized to unparseable XML with no error. Valid (including hyphenated and
+  namespace-prefixed) names are unaffected, as is the parse path.
 
 ## [0.1.0] - 2022-04-23
 
