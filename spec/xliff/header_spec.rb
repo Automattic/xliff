@@ -52,6 +52,11 @@ RSpec.describe Xliff::Header do
     it 'parses the `attributes` correctly' do
       expect(valid_header.attributes['tool-id']).to eq 'com.apple.dt.xcode'
     end
+
+    it 'preserves a namespaced attribute on parse' do
+      header = described_class.from_xml(parse_xml('<note xml:lang="en" foo="bar"/>'))
+      expect(header.attributes).to eq('xml:lang' => 'en', 'foo' => 'bar')
+    end
   end
 
   describe '.to_s' do
