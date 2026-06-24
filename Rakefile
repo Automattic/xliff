@@ -22,5 +22,8 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new do |verify|
+  # Treat the threshold as a floor: fail only when documentation coverage drops below it, not when it rises
+  # above it (which would otherwise turn every documentation improvement into a CI failure).
   verify.threshold = 92.0
+  verify.require_exact_threshold = false
 end
