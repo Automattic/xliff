@@ -23,6 +23,9 @@
 - `Xliff::Entry.from_xml` now raises a clear error for a `<trans-unit>` missing its mandatory `<source>`
   element, rather than silently parsing it to `nil` and fabricating an empty `<source/>`. The optional
   `<target>`/`<note>` (which Xcode omits for untranslated strings) remain tolerated.
+- `Xliff::Entry.from_xml` now raises a clear error for a `<trans-unit>` missing its mandatory `id` attribute,
+  rather than silently fabricating an empty `id=""` that every id-less entry (and `entry_with_id("")`) would
+  then collide on.
 - `Xliff::Header.from_xml` now preserves namespaced attributes. A header attribute such as `xml:lang="en"`
   was previously read as `lang=""` (prefix dropped, value erased) because it was looked up by local name;
   attributes are now read from the parsed nodes, keeping both prefix and value.

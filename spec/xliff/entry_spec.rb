@@ -136,6 +136,12 @@ RSpec.describe Xliff::Entry do
         .to raise_exception msg
     end
 
+    it 'raises when the mandatory `id` attribute is missing' do
+      msg = 'Invalid Entry XML – `<trans-unit>` is missing the required `id` attribute'
+      expect { described_class.from_xml(parse_xml('<trans-unit><source>S</source></trans-unit>')) }
+        .to raise_exception msg
+    end
+
     it 'parses the `id` correctly' do
       expect(valid_entry.id).to eq 'CFBundleDisplayName'
     end
