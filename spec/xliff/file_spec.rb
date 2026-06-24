@@ -141,8 +141,8 @@ RSpec.describe Xliff::File do
         expect(new_file.to_xml.at('header')).to be_nil
       end
 
-      it 'does not contain the `body` element by default' do
-        expect(new_file.to_xml.at('body')).to be_nil
+      it 'contains an (empty) `body` element by default, as the schema requires' do
+        expect(new_file.to_xml.at('body')).not_to be_nil
       end
 
       it 'contains the `body` element if entries are present' do

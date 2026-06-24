@@ -191,11 +191,12 @@ module Xliff
 
     # Encode the file's translation entries into their XML representation
     #
+    # `<body>` is required by the XLIFF schema even when a file has no entries, so an empty `<body>` is always
+    # emitted (unlike the optional `<header>`).
+    #
     # @api private
     # @return [void]
     def add_entries_to_file(fragment, node)
-      return if @entries.empty?
-
       body = Nokogiri::XML::Node.new('body', fragment.document)
       @entries.each do |entry|
         body.add_child(entry.to_xml)

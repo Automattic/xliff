@@ -9,6 +9,9 @@
   attribute in XLIFF 1.2, but round-tripping a `<file>` that omitted it previously emitted
   `target-language=""`, which is invalid (`xsd:language` rejects the empty string) — turning schema-valid
   input into schema-invalid output.
+- `Xliff::File` now always emits a `<body>` element, even when it has no entries. `<body>` is required by the
+  XLIFF schema (an empty one is legal), but a file with no entries previously omitted it entirely, producing
+  schema-invalid output. The optional `<header>` is still omitted when empty.
 
 - Parse Xcode exports for locales that aren't translated yet. `Xliff::Entry.from_xml` previously crashed
   (`NoMethodError`) on `<trans-unit>` elements with no `<target>` — the shape Xcode emits for untranslated
