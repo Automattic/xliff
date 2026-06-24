@@ -21,7 +21,7 @@ module Xliff
     #
     # @param [String] element The XML element to use.
     # @param [String: String] attributes Any attributes that should be set on the header.
-    def initialize(element: nil, attributes: {})
+    def initialize(element:, attributes: {})
       @element = element
       @attributes = attributes.transform_values(&:to_s)
     end
@@ -59,7 +59,7 @@ module Xliff
 
       Header.new(
         element: xml.name,
-        attributes: xml.keys.to_h { |k| [k, xml[k]] }
+        attributes: xml.attribute_nodes.to_h { |a| [[a.namespace&.prefix, a.name].compact.join(':'), a.value] }
       )
     end
   end

@@ -32,6 +32,9 @@
 - `Xliff::Entry` now coerces its `id` to a `String` — on both construction and assignment (`entry.id =`) —
   matching the documented type and the README's example of an integer `id`, so `File#entry_with_id` finds an
   entry consistently before and after a serialize/parse round trip.
+- `Xliff::Header.new` now requires its `element:` argument (matching `Xliff::Entry`'s `id:` and
+  `Xliff::File`'s `original:`). Building a header without one previously constructed fine and then crashed
+  with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.
 
 ## [0.1.0] - 2022-04-23
 

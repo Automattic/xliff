@@ -6,6 +6,10 @@ RSpec.describe Xliff::Header do
       expect(described_class.new(element: 'foo').element).to eq 'foo'
     end
 
+    it 'requires an element' do
+      expect { described_class.new(attributes: { foo: 'bar' }) }.to raise_error(ArgumentError, /element/)
+    end
+
     it 'properly stores the attributes' do
       expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes[:key]).to eq 'value'
     end
