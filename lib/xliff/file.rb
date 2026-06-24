@@ -167,7 +167,9 @@ module Xliff
     private_class_method def self.import_file_body(xml, file)
       return if xml.at('body').nil?
 
-      xml.at('body').element_children.each { |node| file.add_entry Entry.from_xml(node) }
+      xml.at('body').element_children
+         .select { |node| node.name == 'trans-unit' }
+         .each { |node| file.add_entry Entry.from_xml(node) }
     end
 
     private

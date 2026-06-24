@@ -1,0 +1,12 @@
+<file original="x.strings" source-language="en" target-language="fr" datatype="plaintext">
+  <body>
+    <trans-unit id="top" xml:space="preserve">
+      <source>top</source>
+    </trans-unit>
+    <group id="g1">
+      <trans-unit id="inside" xml:space="preserve">
+        <source>nested</source>
+      </trans-unit>
+    </group>
+  </body>
+</file>

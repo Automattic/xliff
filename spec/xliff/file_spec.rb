@@ -85,6 +85,11 @@ RSpec.describe Xliff::File do
     it 'correctly parses file with missing body tag' do
       expect(described_class.from_xml(sample_file_xml('fragment-empty-file.xml')).entries).to be_empty
     end
+
+    it 'skips non-trans-unit children of <body> instead of crashing' do
+      file = described_class.from_xml(sample_file_xml('fragment-file-with-group.xml'))
+      expect(file.entries.map(&:id)).to eq(['top'])
+    end
   end
 
   describe '.to_xml' do

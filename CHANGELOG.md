@@ -11,6 +11,9 @@
   `InfoPlist.strings` against an Xcode `original` path of `Resources/en.lproj/InfoPlist.strings`).
 - `Xliff::Bundle#file_named` no longer raises `TypeError` when the bundle contains a file with a `nil`
   `original` (e.g. a `<file>` parsed without the `original` attribute); such a file is simply skipped.
+- Parsing a `<file>` whose `<body>` contains a schema-valid `<group>` or `<bin-unit>` element no longer
+  crashes the whole parse. Non-`<trans-unit>` children are now skipped (mirroring how `<xliff>` children are
+  filtered), preserving the `<trans-unit>` siblings the library understands.
 
 ## [0.1.0] - 2022-04-23
 
