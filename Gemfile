@@ -15,7 +15,7 @@ gem 'rubocop-rspec', '~> 2.10'
 gem 'simplecov', '~> 0.21.2'
 gem 'simplecov-json', '~> 0.2'
 
-gem 'danger', '~> 8.6'
+gem 'danger', '~> 9.6'
 gem 'danger-rubocop', '~> 0.10'
 gem 'danger-simplecov_json', '~> 0.3'
 
