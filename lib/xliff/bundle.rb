@@ -59,14 +59,14 @@ module Xliff
     # Set the declared `xsi:schemaLocation`, defaulting a blank value
     #
     # An empty or `nil` value is normalised to the XLIFF 1.2 transitional default, because
-    # `xsi:schemaLocation=""` is invalid output.
+    # `xsi:schemaLocation=""` is invalid output. See {Xliff.presence}.
     #
     # @param [String, nil] value The schema location to declare.
     # @return [void]
     # @example Reset to the default
     #   "bundle.schema_location = nil" #=> declares the XLIFF 1.2 transitional schema
     def schema_location=(value)
-      @schema_location = value.to_s.empty? ? DEFAULT_SCHEMA_LOCATION : value
+      @schema_location = Xliff.presence(value) || DEFAULT_SCHEMA_LOCATION
     end
 
     # Add an additional {File} object to the bundle

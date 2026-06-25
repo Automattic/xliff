@@ -68,11 +68,12 @@ module Xliff
     #
     # `xml:space` is a schema enumeration that rejects the empty string, so a blank value is coerced to
     # `default` here (mirroring {#initialize}) to keep {#to_xml} from emitting an invalid `xml:space=""`.
+    # See {Xliff.presence}.
     #
     # @param [String, nil] value The new whitespace behaviour.
     # @return [void]
     def xml_space=(value)
-      @xml_space = value.to_s.empty? ? 'default' : value
+      @xml_space = Xliff.presence(value) || 'default'
     end
 
     # Encode this `Entry` object to an Nokogiri XML Element Representation of a `<trans-unit>` element

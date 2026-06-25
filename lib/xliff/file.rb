@@ -63,8 +63,8 @@ module Xliff
 
       @original = original
       @source_language = source_language
-      @target_language = target_language.to_s.empty? ? nil : target_language
-      @datatype = datatype.to_s.empty? ? 'plaintext' : datatype
+      @target_language = Xliff.presence(target_language)
+      @datatype = Xliff.presence(datatype) || 'plaintext'
 
       @headers = []
       @entries = []
