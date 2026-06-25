@@ -101,7 +101,7 @@ module Xliff
     #
     # Raises for invalid input
     #
-    # @return [Entry, nil]
+    # @return [Entry]
     def self.from_xml(xml)
       validate_source_xml(xml)
 

@@ -120,7 +120,7 @@ module Xliff
     # Raises for invalid input
     #
     # @param [String] path The path to an `xliff` file.
-    # @return [Bundle, nil]
+    # @return [Bundle]
     def self.from_path(path)
       xml = Nokogiri::XML(::File.open(path))
       bundle = from_xml(xml)
@@ -134,7 +134,7 @@ module Xliff
     # Raises for invalid input
     #
     # @param [String] string A string containing XLIFF data.
-    # @return [Xliff::Bundle, nil]
+    # @return [Xliff::Bundle]
     def self.from_string(string)
       xml = Nokogiri::XML(string)
       from_xml(xml)
@@ -145,7 +145,7 @@ module Xliff
     # Raises for invalid input
     #
     # @param [Nokogiri::XML::Element] xml A Nokogiri XML document containing XLIFF data.
-    # @return [Bundle, nil]
+    # @return [Bundle]
     def self.from_xml(xml)
       raise if xml.nil?
 
