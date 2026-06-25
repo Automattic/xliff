@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     xliff (1.0.3)
-      nokogiri (~> 1.13)
+      nokogiri (~> 1.19)
 
 GEM
   remote: https://rubygems.org/
