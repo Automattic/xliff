@@ -40,17 +40,17 @@ end
 
 def new_entry(id: 'id', source: 'source', target: 'target', note: nil)
   Xliff::Entry.new(
-    id: id,
-    source: source,
-    target: target,
-    note: note
+    id:,
+    source:,
+    target:,
+    note:
   )
 end
 
 def new_header(element: 'header', attributes: { foo: 'bar' })
   Xliff::Header.new(
-    element: element,
-    attributes: attributes
+    element:,
+    attributes:
   )
 end
 
@@ -62,10 +62,10 @@ def new_file(
   entries: []
 )
   file = Xliff::File.new(
-    original: original,
-    source_language: source_language,
-    target_language: target_language,
-    datatype: datatype
+    original:,
+    source_language:,
+    target_language:,
+    datatype:
   )
 
   entries.each { |e| file.add_entry(e) }
