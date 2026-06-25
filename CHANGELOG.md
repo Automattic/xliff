@@ -70,6 +70,9 @@
   document are trusted as-is rather than re-validated (Nokogiri already validated them), so a valid-but-exotic
   parsed name — e.g. an NFD-decomposed accent — no longer crashes the parse. A non-`String` element (e.g. a
   `Symbol`) is coerced to a `String` so it serializes cleanly instead of crashing at write time.
+- `Xliff::Header` now coerces attribute **keys** to `String` (it already coerced values), so a header built
+  with `Symbol` keys matches one parsed from XML — both are `Hash<String, String>` — and a colliding
+  string/symbol key pair can no longer silently drop a value on write.
 - `Xliff::File.from_xml` now reads the file's own direct-child `<header>`/`<body>` rather than the first
   descendant of either name. A `<body>` (or `<header>`) nested inside the header skeleton — `<header><skl>
   <internal-file><body>…</body></internal-file></skl>` — no longer shadows the file's real `<body>`, which

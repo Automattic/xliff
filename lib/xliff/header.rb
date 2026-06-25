@@ -36,7 +36,7 @@ module Xliff
       end
 
       @element = element.to_s
-      @attributes = attributes.transform_values(&:to_s)
+      @attributes = attributes.to_h { |key, value| [key.to_s, value.to_s] }
     end
 
     # Encode this {Xliff::Header} object as an Nokogiri XML Element Representation of this header's expected element

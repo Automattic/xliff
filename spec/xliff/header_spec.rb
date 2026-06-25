@@ -24,15 +24,19 @@ RSpec.describe Xliff::Header do
     end
 
     it 'properly stores the attributes' do
-      expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes[:key]).to eq 'value'
+      expect(described_class.new(element: 'foo', attributes: { key: 'value' }).attributes['key']).to eq 'value'
     end
 
     it 'coerces scalars attributes to strings' do
-      expect(described_class.new(element: 'foo', attributes: { key: 1 }).attributes[:key]).to eq '1'
+      expect(described_class.new(element: 'foo', attributes: { key: 1 }).attributes['key']).to eq '1'
     end
 
     it 'coerces non-scalars to strings' do
-      expect(described_class.new(element: 'foo', attributes: { key: {} }).attributes[:key]).to eq '{}'
+      expect(described_class.new(element: 'foo', attributes: { key: {} }).attributes['key']).to eq '{}'
+    end
+
+    it 'coerces attribute keys to strings (matching parsed headers)' do
+      expect(described_class.new(element: 'foo', attributes: { sym: 'v' }).attributes).to eq('sym' => 'v')
     end
   end
 
