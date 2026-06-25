@@ -3,7 +3,7 @@
 RSpec.describe Xliff::Bundle do
   describe '#initialize' do
     it 'properly stores the file path' do
-      expect(described_class.new(path: '/dev/null').path).to eq '/dev/null'
+      expect(described_class.new(path: File::NULL).path).to eq File::NULL
     end
 
     it 'properly stores no file path' do
@@ -35,8 +35,8 @@ RSpec.describe Xliff::Bundle do
   describe '.path=' do
     it 'stores the path correctly' do
       bundle = described_class.new
-      bundle.path = '/dev/null'
-      expect(bundle.path).to eq '/dev/null'
+      bundle.path = File::NULL
+      expect(bundle.path).to eq File::NULL
     end
   end
 
