@@ -108,9 +108,9 @@ module Xliff
 
       Entry.new(
         id: xml['id'],
-        source: direct_child(xml, 'source')&.content,
-        target: direct_child(xml, 'target')&.content,
-        note: direct_child(xml, 'note')&.content,
+        source: xml.child_element('source')&.content,
+        target: xml.child_element('target')&.content,
+        note: xml.child_element('note')&.content,
         xml_space: xml['xml:space']
       )
     end
@@ -123,21 +123,7 @@ module Xliff
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
       raise 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute' if xml['id'].to_s.strip.empty?
-      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if direct_child(xml, 'source').nil?
-    end
-
-    # The first direct child element with the given (local) name, or nil
-    #
-    # Matches by local name (namespace-agnostic, like the rest of the parser) and only considers direct
-    # children, so a nested `<alt-trans>`/`<group>` subtree can't be mistaken for the trans-unit's own
-    # `<source>`/`<target>`/`<note>`.
-    #
-    # @api private
-    # @param [Nokogiri::XML::Element] xml The `<trans-unit>` element.
-    # @param [String] name The local element name to find.
-    # @return [Nokogiri::XML::Element, nil]
-    private_class_method def self.direct_child(xml, name)
-      xml.element_children.find { |node| node.name == name }
+      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if xml.child_element('source').nil?
     end
   end
 end

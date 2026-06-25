@@ -21,6 +21,35 @@ module Nokogiri
         node.content = content
         add_child(node)
       end
+
+      # The first direct child element with the given (local) name, or `nil`
+      #
+      # Matches by local name and considers only direct children — unlike `at`/`css`, which descend the whole
+      # subtree — so a nested element (e.g. an `<alt-trans>`'s `<target>`, or a `<body>` inside a header
+      # skeleton) can't be mistaken for a direct child of this element.
+      #
+      # @param [String] name The local element name to find.
+      # @example Read a `<trans-unit>`'s own `<source>`
+      #   trans_unit.child_element('source')
+      # @api private
+      # @return [Nokogiri::XML::Element, nil]
+      def child_element(name)
+        element_children.find { |node| node.name == name }
+      end
+
+      # All direct child elements with the given (local) name
+      #
+      # The `select`-all counterpart to {#child_element}: matches by local name and considers only direct
+      # children, never descendants.
+      #
+      # @param [String] name The local element name to find.
+      # @example Collect the `<file>` children of an `<xliff>` root
+      #   root.child_elements('file')
+      # @api private
+      # @return [Array<Nokogiri::XML::Element>]
+      def child_elements(name)
+        element_children.select { |node| node.name == name }
+      end
     end
   end
 end

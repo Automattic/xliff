@@ -179,9 +179,7 @@ module Xliff
     # @param [Bundle] bundle The {Bundle} being built.
     # @return [void]
     private_class_method def self.import_files(root, bundle)
-      root.element_children
-          .select { |node| node.name == 'file' }
-          .each { |node| bundle.add_file File.from_xml(node) }
+      root.child_elements('file').each { |node| bundle.add_file File.from_xml(node) }
     end
 
     private

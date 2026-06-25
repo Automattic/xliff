@@ -175,7 +175,7 @@ module Xliff
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_header(xml, file)
-      header = xml.element_children.find { |node| node.name == 'header' }
+      header = xml.child_element('header')
       return if header.nil?
 
       header.element_children.each { |node| file.add_header Header.from_xml(node) }
@@ -190,7 +190,7 @@ module Xliff
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_body(xml, file)
-      body = xml.element_children.find { |node| node.name == 'body' }
+      body = xml.child_element('body')
       return if body.nil?
 
       trans_units, others = body.element_children.partition { |node| node.name == 'trans-unit' }
