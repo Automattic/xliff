@@ -87,6 +87,16 @@ RSpec.describe Xliff::Bundle do
     it 'raises rather than emit a file-less `<xliff>` (the schema requires at least one `<file>`)' do
       expect { described_class.new.to_xml }.to raise_error(/at least one/)
     end
+
+    # Content survival, not byte-identity: a `<group>` in a namespaced document is re-emitted with a
+    # redundant `xmlns` and after the file's entries, so this asserts the nested unit survives rather than
+    # a byte-for-byte round trip (full fidelity is tracked in #16/#17).
+    it 'preserves a namespaced <group> and its nested <trans-unit> through a round-trip' do
+      bundle = described_class.from_string(sample_file_contents('xcode-with-group.xliff'))
+      reparsed = Nokogiri::XML(bundle.to_s)
+
+      expect(reparsed.xpath("//*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(%w[top nested])
+    end
   end
 
   describe '.file_named' do

@@ -13,8 +13,10 @@ module Xliff
 
     # `<body>` children the library does not model (e.g. `<group>`, `<bin-unit>`)
     #
-    # Captured verbatim from the source document on parse and re-emitted on write, so their nested content
-    # survives a round-trip even though it is not parsed into {#entries}.
+    # Captured from the source document on parse and re-emitted on write, so their nested content survives a
+    # round-trip even though it is not parsed into {#entries}. Content is preserved rather than reproduced
+    # byte-for-byte: the nodes are re-emitted after the file's entries, and in a namespaced document a moved
+    # node may gain a redundant namespace declaration (full fidelity is tracked in #16/#17).
     # @return [Array<Nokogiri::XML::Node>]
     # @example Inspect the preserved (unmodeled) body children
     #   "file.unparsed_body_nodes.map(&:name)" #=> ["group"]
