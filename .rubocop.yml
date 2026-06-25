@@ -9,6 +9,8 @@ Metrics/BlockLength:
 Gemspec/RequireMFA:
   Enabled: false
 
-require:
+plugins:
   - rubocop-rspec
+
+require:
   - rubocop-rake
