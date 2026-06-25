@@ -75,7 +75,7 @@ module Xliff
     # @example Add a new file to the bundle
     #   file = File.new(...)
     #   bundle.add_file(file)
-    # @return
+    # @return [void]
     def add_file(file)
       @files << file
     end

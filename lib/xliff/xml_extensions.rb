@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'nokogiri'
+
 # Extensions of the Nokogiri gem for use with this project.
 module Nokogiri
   # Customizations to the Nokogiri XML namespace.
@@ -10,8 +12,7 @@ module Nokogiri
       #
       # @param [String] element The XML tag name to use.
       # @param [String] content The text contents of the XML tag.
-      # @example Look up an existing file
-      #   # To Generate <text>Hello World</text>:
+      # @example Generate `<text>Hello World</text>` as a child node
       #   xml.add_leaf_node(element: 'text', content: 'Hello World')
       # @api private
       # @return [Void]

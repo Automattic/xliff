@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'nokogiri'
+
 module Xliff
   # Models a single file for translation
   class File
@@ -152,7 +154,7 @@ module Xliff
     #
     # Automatically run prior to attempting to parse using `from_xml`.
     #
-    # @raise [ExceptionClass] Raises exceptions if the input XML does not match expectations.
+    # @raise [RuntimeError] If the input XML is nil, not a Nokogiri element, or not a valid `<file>`.
     # @return [void]
     def self.validate_source_xml(xml)
       raise 'File XML is nil' if xml.nil?
