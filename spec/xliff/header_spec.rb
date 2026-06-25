@@ -79,6 +79,11 @@ RSpec.describe Xliff::Header do
       expect(header.attributes).to eq('xml:lang' => 'en', 'foo' => 'bar')
     end
 
+    it 're-emits a namespaced attribute on write (round-trip)' do
+      header = described_class.from_xml(parse_xml('<note xml:lang="en" foo="bar"/>'))
+      expect(header.to_s).to eq '<note xml:lang="en" foo="bar"/>'
+    end
+
     it 'accepts a valid-but-exotic XML name (e.g. an NFD-decomposed accent) without re-validating it' do
       name = "caf#{[0x0065, 0x0301].pack('U*')}" # "cafe" + combining acute (NFD) — a valid XML name
       expect(described_class.from_xml(parse_xml("<#{name} v='1'/>")).element).to eq(name)
