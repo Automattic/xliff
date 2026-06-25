@@ -35,6 +35,22 @@ RSpec.describe Xliff::Bundle do
       bundle = described_class.from_string(sample_file_contents('non-xsi-schema-prefix.xliff'))
       expect(bundle.schema_location).to include('xliff-core-1.2-strict.xsd')
     end
+
+    it 'falls back to the default when constructed with an empty schema_location' do
+      expect(described_class.new(schema_location: '').schema_location).to include('xliff-core-1.2-transitional.xsd')
+    end
+
+    it 'falls back to the default when assigned a nil schema_location' do
+      bundle = described_class.new
+      bundle.schema_location = nil
+      expect(bundle.schema_location).to include('xliff-core-1.2-transitional.xsd')
+    end
+
+    it 'never emits an empty `xsi:schemaLocation`' do
+      bundle = described_class.new(schema_location: '')
+      bundle.add_file(new_file)
+      expect(bundle.to_s).not_to include('schemaLocation=""')
+    end
   end
 
   describe '#from_path' do

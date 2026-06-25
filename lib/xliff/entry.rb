@@ -18,11 +18,11 @@ module Xliff
     attr_accessor :source
 
     # The translated text
-    # @return [String]
+    # @return [String, nil]
     attr_accessor :target
 
     # Documentation for translators understand the context of a string
-    # @return [String]
+    # @return [String, nil]
     attr_accessor :note
 
     # The XML whitespace processing behaviour
@@ -37,7 +37,7 @@ module Xliff
     # @param [String] source The original text.
     # @param [String, nil] target The translated text. Omitted by Xcode for strings that haven't been translated
     #   yet, so it defaults to `nil` and no `<target>` element is emitted when absent.
-    # @param [String] note Documentation for translators understand the context of a string.
+    # @param [String, nil] note Documentation for translators understand the context of a string.
     # @param [String] xml_space The XML whitespace processing behaviour.
     def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
       self.id = id

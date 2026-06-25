@@ -22,14 +22,14 @@ module Xliff
 
     # The `xsi:schemaLocation` declared on the `<xliff>` root
     #
-    # Preserved verbatim from the source document when parsing, and defaulting to the XLIFF 1.2 transitional
-    # schema for bundles built from scratch.
+    # Preserved from the source document when parsing (an absent or empty declaration falls back to the
+    # default), and defaulting to the XLIFF 1.2 transitional schema for bundles built from scratch.
     # @!attribute [rw] schema_location
     # @return [String]
     # @api public
     # @example Retrieve the schema location
     #   "bundle.schema_location" #=> "urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/..."
-    attr_accessor :schema_location
+    attr_reader :schema_location
 
     # The default `xsi:schemaLocation` for bundles built from scratch: XLIFF 1.2 transitional, not strict,
     # because the library round-trips real-world content (e.g. Xcode's `<tool build-num>`) that only the
@@ -52,8 +52,21 @@ module Xliff
     #   bundle.new(path: /path/to/my/output/file.xliff)
     def initialize(path: nil, schema_location: DEFAULT_SCHEMA_LOCATION)
       @path = path
-      @schema_location = schema_location
+      self.schema_location = schema_location
       @files = []
+    end
+
+    # Set the declared `xsi:schemaLocation`, defaulting a blank value
+    #
+    # An empty or `nil` value is normalised to the XLIFF 1.2 transitional default, because
+    # `xsi:schemaLocation=""` is invalid output.
+    #
+    # @param [String, nil] value The schema location to declare.
+    # @return [void]
+    # @example Reset to the default
+    #   "bundle.schema_location = nil" #=> declares the XLIFF 1.2 transitional schema
+    def schema_location=(value)
+      @schema_location = value.to_s.empty? ? DEFAULT_SCHEMA_LOCATION : value
     end
 
     # Add an additional {File} object to the bundle
@@ -153,7 +166,7 @@ module Xliff
       raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
 
       declared_schema = root.attribute_with_ns('schemaLocation', XSI_NAMESPACE)&.value
-      bundle = Bundle.new(schema_location: declared_schema || DEFAULT_SCHEMA_LOCATION)
+      bundle = Bundle.new(schema_location: declared_schema)
       import_files(root, bundle)
 
       bundle

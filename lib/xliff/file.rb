@@ -8,7 +8,7 @@ module Xliff
     attr_reader :headers
 
     # The file's translation entries
-    # @return [Array<Header>]
+    # @return [Array<Entry>]
     attr_reader :entries
 
     # `<body>` children the library does not model (e.g. `<group>`, `<bin-unit>`)
@@ -36,7 +36,7 @@ module Xliff
     # This usually matches the `source_language` for files to be translated – it will differ if the file has
     # been translated.
     #
-    # @return [String]
+    # @return [String, nil]
     attr_reader :target_language
 
     # The type of data represented
@@ -104,7 +104,7 @@ module Xliff
     #
     # Also encodes any headers and translation strings as children of the `File` element.
     #
-    # @return [Nokogiri::XML.fragment]
+    # @return [Nokogiri::XML::Element]
     def to_xml
       fragment = Nokogiri::XML.fragment('')
       file_node = fragment.document.create_element('file')
@@ -130,7 +130,7 @@ module Xliff
     #
     # Raises for invalid input, and parses all child translation entries.
     #
-    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @param [Nokogiri::XML::Element] xml An XLIFF `<file>` fragment.
     # @return [File]
     def self.from_xml(xml)
       validate_source_xml(xml)
@@ -169,7 +169,7 @@ module Xliff
     # Parses the `<header>` XML tag and imports any headers into the file.
     #
     # @api private
-    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @param [Nokogiri::XML::Element] xml An XLIFF `<file>` fragment.
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_header(xml, file)
@@ -183,7 +183,7 @@ module Xliff
     # Parses the `<body>` XML tag and imports any translation entries into the file.
     #
     # @api private
-    # @param [Nokogiri::XML::Element, #read] xml An XLIFF `<file>` fragment.
+    # @param [Nokogiri::XML::Element] xml An XLIFF `<file>` fragment.
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_body(xml, file)

@@ -30,6 +30,9 @@
   optional attribute in XLIFF 1.2, but round-tripping a `<file>` that omitted it previously emitted
   `target-language=""`, which is invalid (`xsd:language` rejects the empty string) — turning schema-valid
   input into schema-invalid output.
+- `Xliff::Bundle#schema_location` no longer emits an invalid `xsi:schemaLocation=""`. An empty or `nil` value —
+  set explicitly, assigned via `schema_location=`, or parsed from an empty source declaration — now falls back
+  to the transitional default, matching how empty `datatype`/`xml:space`/`target-language` are handled.
 - `Xliff::File` now always emits a `<body>` element, even when it has no entries. `<body>` is required by the
   XLIFF schema (an empty one is legal), but a file with no entries previously omitted it entirely, producing
   schema-invalid output. The optional `<header>` is still omitted when empty.

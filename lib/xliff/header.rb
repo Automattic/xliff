@@ -23,7 +23,7 @@ module Xliff
     #
     # Most often used to build an XLIFF file by hand.
     #
-    # @param [String] element The XML element to use.
+    # @param [#to_s] element The XML element to use.
     # @param [String: String] attributes Any attributes that should be set on the header.
     def initialize(element:, attributes: {})
       raise "Invalid Header element name – #{element.inspect}" unless element.to_s.match?(VALID_ELEMENT_NAME)
@@ -34,7 +34,7 @@ module Xliff
 
     # Encode this {Xliff::Header} object as an Nokogiri XML Element Representation of this header's expected element
     #
-    # @return [Nokogiri::XML.fragment]
+    # @return [Nokogiri::XML::Element]
     def to_xml
       fragment = Nokogiri::XML.fragment('')
       node = fragment.document.create_element(@element)
