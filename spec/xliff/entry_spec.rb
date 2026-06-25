@@ -77,6 +77,20 @@ RSpec.describe Xliff::Entry do
     end
   end
 
+  describe '.xml_space=' do
+    it 'allows overwriting the xml:space value' do
+      entry = new_entry
+      entry.xml_space = 'preserve'
+      expect(entry.xml_space).to eq 'preserve'
+    end
+
+    it 'normalises a blank assigned value to "default"' do
+      entry = new_entry
+      entry.xml_space = ''
+      expect(entry.xml_space).to eq 'default'
+    end
+  end
+
   describe '.to_xml' do
     it 'produces valid XML' do
       expect(new_entry.to_xml).to be_a Nokogiri::XML::Element

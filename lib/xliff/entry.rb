@@ -27,7 +27,7 @@ module Xliff
 
     # The XML whitespace processing behaviour
     # @return [String]
-    attr_accessor :xml_space
+    attr_reader :xml_space
 
     # Create a blank Entry object
     #
@@ -44,7 +44,7 @@ module Xliff
       @source = source
       @target = target
       @note = note
-      @xml_space = xml_space.to_s.empty? ? 'default' : xml_space
+      self.xml_space = xml_space
     end
 
     # Set the unique identifier, coercing the value to a `String`
@@ -61,6 +61,17 @@ module Xliff
       raise ArgumentError, 'Entry `id` must not be empty' if coerced.empty?
 
       @id = coerced
+    end
+
+    # Set the XML whitespace processing behaviour, normalising a blank value to `default`
+    #
+    # `xml:space` is a schema enumeration that rejects the empty string, so a blank value is coerced to
+    # `default` here (mirroring {#initialize}) to keep {#to_xml} from emitting an invalid `xml:space=""`.
+    #
+    # @param [String, nil] value The new whitespace behaviour.
+    # @return [void]
+    def xml_space=(value)
+      @xml_space = value.to_s.empty? ? 'default' : value
     end
 
     # Encode this `Entry` object to an Nokogiri XML Element Representation of a `<trans-unit>` element
