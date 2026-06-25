@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Read and write xliff files'
   spec.homepage = 'https://github.com/automattic/xliff'
   spec.license = 'MIT'
-  spec.required_ruby_version = '>= 2.7.4'
+  spec.required_ruby_version = '>= 3.2'
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
