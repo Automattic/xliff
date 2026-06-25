@@ -27,11 +27,15 @@ RSpec.describe Xliff::Entry do
     end
 
     it 'rejects a nil id' do
-      expect { described_class.new(id: nil, source: 'source') }.to raise_error(ArgumentError, /must not be empty/)
+      expect { described_class.new(id: nil, source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
     end
 
     it 'rejects an empty id' do
-      expect { described_class.new(id: '', source: 'source') }.to raise_error(ArgumentError, /must not be empty/)
+      expect { described_class.new(id: '', source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
+    end
+
+    it 'rejects a whitespace-only id' do
+      expect { described_class.new(id: "  \t\n", source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
     end
   end
 
@@ -49,7 +53,11 @@ RSpec.describe Xliff::Entry do
     end
 
     it 'rejects an empty assigned id' do
-      expect { new_entry.id = '' }.to raise_error(ArgumentError, /must not be empty/)
+      expect { new_entry.id = '' }.to raise_error(ArgumentError, /must not be blank/)
+    end
+
+    it 'rejects a whitespace-only assigned id' do
+      expect { new_entry.id = '   ' }.to raise_error(ArgumentError, /must not be blank/)
     end
   end
 
@@ -163,14 +171,20 @@ RSpec.describe Xliff::Entry do
     end
 
     it 'raises when the mandatory `id` attribute is missing' do
-      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute'
+      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute'
       expect { described_class.from_xml(parse_xml('<trans-unit><source>S</source></trans-unit>')) }
         .to raise_exception msg
     end
 
     it 'raises when the `id` attribute is present but empty' do
-      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute'
+      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute'
       expect { described_class.from_xml(parse_xml('<trans-unit id=""><source>S</source></trans-unit>')) }
+        .to raise_exception msg
+    end
+
+    it 'raises when the `id` attribute is present but only whitespace' do
+      msg = 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute'
+      expect { described_class.from_xml(parse_xml('<trans-unit id="   "><source>S</source></trans-unit>')) }
         .to raise_exception msg
     end
 

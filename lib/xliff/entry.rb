@@ -50,15 +50,16 @@ module Xliff
     # Set the unique identifier, coercing the value to a `String`
     #
     # XML attributes are always strings, so coercing here keeps `id` consistent whether it was built by hand
-    # (e.g. with an integer) or parsed back from a document. An empty `id` is rejected: it is meaningless and
-    # every empty-id entry would collide under {File#entry_with_id}.
+    # (e.g. with an integer) or parsed back from a document. A blank `id` (empty or whitespace-only) is
+    # rejected: it is meaningless as a unique identifier, and an empty one would collide for every id-less
+    # entry under {File#entry_with_id}.
     #
     # @param [#to_s] value The new identifier.
-    # @raise [ArgumentError] If the coerced value is empty.
+    # @raise [ArgumentError] If the coerced value is blank (empty or whitespace-only).
     # @return [void]
     def id=(value)
       coerced = value.to_s
-      raise ArgumentError, 'Entry `id` must not be empty' if coerced.empty?
+      raise ArgumentError, 'Entry `id` must not be blank' if coerced.strip.empty?
 
       @id = coerced
     end
@@ -121,7 +122,7 @@ module Xliff
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
-      raise 'Invalid Entry XML – `<trans-unit>` has a missing or empty `id` attribute' if xml['id'].to_s.empty?
+      raise 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute' if xml['id'].to_s.strip.empty?
       raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if direct_child(xml, 'source').nil?
     end
 
