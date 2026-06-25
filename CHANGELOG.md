@@ -64,10 +64,17 @@
 - `Xliff::Header.new` now requires its `element:` argument (matching `Xliff::Entry`'s `id:` and
   `Xliff::File`'s `original:`). Building a header without one previously constructed fine and then crashed
   with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.
-- `Xliff::Header.new` now rejects an `element:` that is not a valid XML element name (e.g. one containing a
-  space), which previously serialized to unparseable XML with no error. Valid (including hyphenated,
-  namespace-prefixed, and Unicode) names are unaffected, as is the parse path. A non-`String` element (e.g. a
+- `Xliff::Header.new` now rejects an `element:` (and, likewise, an attribute name) that is not a valid XML
+  name when building by hand — e.g. one containing a space, which previously serialized to unparseable/malformed
+  XML with no error. Common hyphenated, namespace-prefixed, and Unicode names are accepted. Names from a parsed
+  document are trusted as-is rather than re-validated (Nokogiri already validated them), so a valid-but-exotic
+  parsed name — e.g. an NFD-decomposed accent — no longer crashes the parse. A non-`String` element (e.g. a
   `Symbol`) is coerced to a `String` so it serializes cleanly instead of crashing at write time.
+- `Xliff::File.from_xml` now reads the file's own direct-child `<header>`/`<body>` rather than the first
+  descendant of either name. A `<body>` (or `<header>`) nested inside the header skeleton — `<header><skl>
+  <internal-file><body>…</body></internal-file></skl>` — no longer shadows the file's real `<body>`, which
+  previously caused every real `<trans-unit>` to be silently dropped. (Same recursive-lookup fix already
+  applied to `<source>`/`<target>`/`<note>`.)
 
 ## [0.1.0] - 2022-04-23
 

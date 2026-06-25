@@ -154,6 +154,13 @@ RSpec.describe Xliff::File do
       # The nested `inside` unit can only survive if the enclosing `<group>` was preserved verbatim.
       expect(reparsed.xpath("//*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(%w[top inside])
     end
+
+    it "reads the file's own <body>, not a <body> nested inside the <header>" do
+      xml = parse_xml('<file original="a" source-language="en" datatype="plaintext">' \
+                      '<header><skl><internal-file><body>skel</body></internal-file></skl></header>' \
+                      '<body><trans-unit id="real" xml:space="default"><source>Hi</source></trans-unit></body></file>')
+      expect(described_class.from_xml(xml).entries.map(&:id)).to eq(['real'])
+    end
   end
 
   describe '.to_xml' do

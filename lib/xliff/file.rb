@@ -173,9 +173,10 @@ module Xliff
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_header(xml, file)
-      return if xml.at('header').nil?
+      header = xml.element_children.find { |node| node.name == 'header' }
+      return if header.nil?
 
-      xml.at('header').element_children.each { |node| file.add_header Header.from_xml(node) }
+      header.element_children.each { |node| file.add_header Header.from_xml(node) }
     end
 
     # Import File <trans-unit> Tags from given XML
@@ -187,7 +188,7 @@ module Xliff
     # @param [File] file The {File} object being created.
     # @return [void]
     private_class_method def self.import_file_body(xml, file)
-      body = xml.at('body')
+      body = xml.element_children.find { |node| node.name == 'body' }
       return if body.nil?
 
       trans_units, others = body.element_children.partition { |node| node.name == 'trans-unit' }

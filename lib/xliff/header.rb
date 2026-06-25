@@ -7,7 +7,10 @@ module Xliff
   #
   # Headers have an element and a set of key/value pairs encoded as XML attributes.
   class Header
-    # A valid (optionally namespace-prefixed) XML element name.
+    # A valid (optionally namespace-prefixed) XML name. Used to reject obviously-malformed names supplied on
+    # the build-by-hand path (e.g. one containing a space). Names that come from a parsed document are trusted
+    # rather than re-checked against this — see {.from_xml} — because Nokogiri has already validated them and
+    # this pattern intentionally doesn't enumerate every exotic XML 1.0 name character.
     VALID_ELEMENT_NAME = /\A[[:alpha:]_][[:alnum:]_.-]*(?::[[:alpha:]_][[:alnum:]_.-]*)?\z/.freeze
     private_constant :VALID_ELEMENT_NAME
 
@@ -27,6 +30,10 @@ module Xliff
     # @param [String: String] attributes Any attributes that should be set on the header.
     def initialize(element:, attributes: {})
       raise "Invalid Header element name – #{element.inspect}" unless element.to_s.match?(VALID_ELEMENT_NAME)
+
+      attributes.each_key do |key|
+        raise "Invalid Header attribute name – #{key.inspect}" unless key.to_s.match?(VALID_ELEMENT_NAME)
+      end
 
       @element = element.to_s
       @attributes = attributes.transform_values(&:to_s)
@@ -55,7 +62,10 @@ module Xliff
 
     # Decode the given XML into an {Xliff::Header} object, if possible
     #
-    # Raises for invalid input.
+    # Raises for invalid input. The element and attribute names come straight from a parsed document, so they
+    # are used as-is rather than run through the build-time name validation in {#initialize} — Nokogiri has
+    # already validated them, and re-checking would wrongly reject valid-but-exotic XML names (e.g. an
+    # NFD-decomposed accent), crashing the parse.
     #
     # @param [Nokogiri::XML::Element] xml An XLIFF header fragment.
     # @return [Header]
@@ -63,10 +73,19 @@ module Xliff
       raise 'Header XML is nil' if xml.nil?
       raise "Invalid Header XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
 
-      Header.new(
-        element: xml.name,
-        attributes: xml.attribute_nodes.to_h { |a| [[a.namespace&.prefix, a.name].compact.join(':'), a.value] }
-      )
+      header = allocate
+      header.instance_variable_set(:@element, xml.name)
+      header.instance_variable_set(:@attributes, attributes_from(xml))
+      header
+    end
+
+    # Read a header element's attributes into a `{ "prefix:name" => value }` hash, keeping namespace prefixes
+    #
+    # @api private
+    # @param [Nokogiri::XML::Element] xml The parsed header element.
+    # @return [Hash{String => String}]
+    private_class_method def self.attributes_from(xml)
+      xml.attribute_nodes.to_h { |a| [[a.namespace&.prefix, a.name].compact.join(':'), a.value] }
     end
   end
 end

@@ -14,6 +14,11 @@ RSpec.describe Xliff::Header do
       expect { described_class.new(element: 'bad name') }.to raise_error(/Invalid Header element name/)
     end
 
+    it 'rejects an attribute name that is not a valid XML name' do
+      expect { described_class.new(element: 'tool', attributes: { 'build num' => 'x' }) }
+        .to raise_error(/Invalid Header attribute name/)
+    end
+
     it 'coerces a non-string element so it serializes cleanly instead of raising' do
       expect(described_class.new(element: :tool).to_s).to eq '<tool/>'
     end
@@ -68,6 +73,11 @@ RSpec.describe Xliff::Header do
     it 'preserves a namespaced attribute on parse' do
       header = described_class.from_xml(parse_xml('<note xml:lang="en" foo="bar"/>'))
       expect(header.attributes).to eq('xml:lang' => 'en', 'foo' => 'bar')
+    end
+
+    it 'accepts a valid-but-exotic XML name (e.g. an NFD-decomposed accent) without re-validating it' do
+      name = "caf#{[0x0065, 0x0301].pack('U*')}" # "cafe" + combining acute (NFD) — a valid XML name
+      expect(described_class.from_xml(parse_xml("<#{name} v='1'/>")).element).to eq(name)
     end
 
     it 'accepts a Unicode element name (a valid XML name) on parse' do
