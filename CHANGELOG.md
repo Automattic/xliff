@@ -26,13 +26,14 @@
   (the schema requires at least one `<file>`). Previously an empty bundle serialized to just an XML
   declaration with no root element. Reading a file-less `<xliff>` is still tolerated — it parses to an empty
   bundle — it simply can't be serialized back out (liberal on read, strict on write).
-- `target-language` is now optional on `Xliff::File` and omitted from output when absent (or empty). It is an
+- `target-language` is now optional on `Xliff::File` and omitted from output when absent (or blank). It is an
   optional attribute in XLIFF 1.2, but round-tripping a `<file>` that omitted it previously emitted
   `target-language=""`, which is invalid (`xsd:language` rejects the empty string) — turning schema-valid
   input into schema-invalid output.
-- `Xliff::Bundle#schema_location` no longer emits an invalid `xsi:schemaLocation=""`. An empty or `nil` value —
-  set explicitly, assigned via `schema_location=`, or parsed from an empty source declaration — now falls back
-  to the transitional default, matching how empty `datatype`/`xml:space`/`target-language` are handled.
+- `Xliff::Bundle#schema_location` no longer emits an invalid `xsi:schemaLocation=""`. An empty, whitespace-only,
+  or `nil` value — set explicitly, assigned via `schema_location=`, or parsed from a blank source declaration —
+  now falls back to the transitional default, matching how blank `datatype`/`xml:space`/`target-language` are
+  handled (a single `Xliff.presence` helper backs all four).
 - `Xliff::File` now always emits a `<body>` element, even when it has no entries. `<body>` is required by the
   XLIFF schema (an empty one is legal), but a file with no entries previously omitted it entirely, producing
   schema-invalid output. The optional `<header>` is still omitted when empty.
@@ -44,9 +45,9 @@
   `Bundle#file_named`; it is now prevented at the source.)
 - `Xliff::Bundle.from_string`/`from_path` now raise the documented `Invalid XLIFF file` error for empty,
   whitespace-only, or otherwise root-less input instead of leaking an internal `NoMethodError`.
-- A `<file>` parsed without (or with an empty) `datatype` attribute now falls back to the documented
+- A `<file>` parsed without (or with a blank) `datatype` attribute now falls back to the documented
   `plaintext` default instead of becoming `nil`/`""` and serializing to an invalid `datatype=""`.
-- A `<trans-unit>` parsed without (or with an empty) `xml:space` attribute now falls back to the documented
+- A `<trans-unit>` parsed without (or with a blank) `xml:space` attribute now falls back to the documented
   `default` value instead of serializing to an invalid `xml:space=""`.
 - `Xliff::Entry.from_xml` now raises a clear error for a `<trans-unit>` missing its mandatory `<source>`
   element, rather than silently parsing it to `nil` and fabricating an empty `<source/>`. The optional

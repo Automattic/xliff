@@ -42,8 +42,16 @@ RSpec.describe Xliff::File do
       expect(new_file(target_language: '').target_language).to be_nil
     end
 
+    it 'treats a whitespace-only target_language as absent' do
+      expect(new_file(target_language: '   ').target_language).to be_nil
+    end
+
     it 'treats an empty datatype as the default' do
       expect(new_file(datatype: '').datatype).to eq 'plaintext'
+    end
+
+    it 'treats a whitespace-only datatype as the default' do
+      expect(new_file(datatype: '   ').datatype).to eq 'plaintext'
     end
 
     it 'has no files by default' do

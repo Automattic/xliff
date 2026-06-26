@@ -97,6 +97,12 @@ RSpec.describe Xliff::Entry do
       entry.xml_space = ''
       expect(entry.xml_space).to eq 'default'
     end
+
+    it 'normalises a whitespace-only assigned value to "default"' do
+      entry = new_entry
+      entry.xml_space = "  \t"
+      expect(entry.xml_space).to eq 'default'
+    end
   end
 
   describe '.to_xml' do

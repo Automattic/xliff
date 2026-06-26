@@ -22,7 +22,7 @@ module Xliff
 
     # The `xsi:schemaLocation` declared on the `<xliff>` root
     #
-    # Preserved from the source document when parsing (an absent or empty declaration falls back to the
+    # Preserved from the source document when parsing (an absent or blank declaration falls back to the
     # default), and defaulting to the XLIFF 1.2 transitional schema for bundles built from scratch.
     # @!attribute [rw] schema_location
     # @return [String]
@@ -58,7 +58,7 @@ module Xliff
 
     # Set the declared `xsi:schemaLocation`, defaulting a blank value
     #
-    # An empty or `nil` value is normalised to the XLIFF 1.2 transitional default, because
+    # An empty, whitespace-only, or `nil` value is normalised to the XLIFF 1.2 transitional default, because
     # `xsi:schemaLocation=""` is invalid output. See {Xliff.presence}.
     #
     # @param [String, nil] value The schema location to declare.

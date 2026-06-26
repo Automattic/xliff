@@ -66,9 +66,9 @@ module Xliff
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`
     #
-    # `xml:space` is a schema enumeration that rejects the empty string, so a blank value is coerced to
-    # `default` here (mirroring {#initialize}) to keep {#to_xml} from emitting an invalid `xml:space=""`.
-    # See {Xliff.presence}.
+    # `xml:space` is a schema enumeration that rejects the empty string, so a blank value – empty or
+    # whitespace-only – is coerced to `default` here (mirroring {#initialize}) to keep {#to_xml} from
+    # emitting an invalid `xml:space=""`. See {Xliff.presence}.
     #
     # @param [String, nil] value The new whitespace behaviour.
     # @return [void]

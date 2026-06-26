@@ -54,8 +54,8 @@ module Xliff
     # @param [String] original The original file name. Required by XLIFF 1.2; must not be empty.
     # @param [String] source_language The locale code for the source language. Required; must not be empty.
     # @param [String, nil] target_language The locale code for the translated language. Optional in XLIFF 1.2,
-    #   so an absent (or empty) value becomes `nil` and no `target-language` attribute is emitted.
-    # @param [String] datatype The type of data represented. An absent (or empty) value defaults to `plaintext`.
+    #   so an absent (or blank) value becomes `nil` and no `target-language` attribute is emitted.
+    # @param [String] datatype The type of data represented. An absent (or blank) value defaults to `plaintext`.
     # @raise [ArgumentError] If `original` or `source_language` is empty.
     def initialize(original:, source_language:, target_language: nil, datatype: 'plaintext')
       raise ArgumentError, 'File `original` must not be empty' if original.to_s.empty?

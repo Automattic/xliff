@@ -40,6 +40,10 @@ RSpec.describe Xliff::Bundle do
       expect(described_class.new(schema_location: '').schema_location).to include('xliff-core-1.2-transitional.xsd')
     end
 
+    it 'falls back to the default when constructed with a whitespace-only schema_location' do
+      expect(described_class.new(schema_location: '   ').schema_location).to include('xliff-core-1.2-transitional.xsd')
+    end
+
     it 'falls back to the default when assigned a nil schema_location' do
       bundle = described_class.new
       bundle.schema_location = nil
