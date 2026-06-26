@@ -135,7 +135,7 @@ module Xliff
     # @param [String] path The path to an `xliff` file.
     # @return [Bundle]
     def self.from_path(path)
-      xml = Nokogiri::XML(::File.open(path))
+      xml = ::File.open(path) { |file| Nokogiri::XML(file) }
       bundle = from_xml(xml)
       bundle.path = path
 
