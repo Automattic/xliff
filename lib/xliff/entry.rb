@@ -104,26 +104,31 @@ module Xliff
     #
     # @return [Entry]
     def self.from_xml(xml)
-      validate_source_xml(xml)
+      source = validate_source_xml(xml)
 
       Entry.new(
         id: xml['id'],
-        source: xml.child_element('source').content,
+        source: source.content,
         target: xml.child_element('target')&.content,
         note: xml.child_element('note')&.content,
         xml_space: xml['xml:space']
       )
     end
 
-    # Validate the given XML to ensure that it's a valid `<trans-unit>` element
+    # Validate the given XML to ensure that it's a valid `<trans-unit>` element, returning its `<source>`
     #
-    # @return [void]
+    # @return [Nokogiri::XML::Element] The validated `<source>` element, so {.from_xml} can read it without
+    #   scanning the children a second time.
     def self.validate_source_xml(xml)
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
       raise 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute' if Xliff.blank?(xml['id'])
-      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if xml.child_element('source').nil?
+
+      source = xml.child_element('source')
+      raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if source.nil?
+
+      source
     end
   end
 end
