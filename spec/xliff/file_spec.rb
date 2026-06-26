@@ -183,12 +183,30 @@ RSpec.describe Xliff::File do
       expect(file.entries.map(&:id)).to eq(['top'])
     end
 
-    it 'preserves a <group> and its nested <trans-unit> on round-trip' do
-      file = described_class.from_xml(sample_file_xml('fragment-file-with-group.xml'))
-      reparsed = Nokogiri::XML(file.to_s)
+    # A `<group>` is preserved verbatim, not parsed. These assert it survives as a single wrapper carrying
+    # its own attributes and nested content — not merely that a `trans-unit` with the right id exists
+    # somewhere (a descendant-axis id list stays green even if the group is dropped and its child hoisted,
+    # or its source blanked).
+    context 'when the <body> contains an unmodeled <group>' do
+      let(:reparsed) { Nokogiri::XML(described_class.from_xml(sample_file_xml('fragment-file-with-group.xml')).to_s) }
+      let(:body_children) { reparsed.xpath("//*[local-name()='body']/*") }
+      let(:group) { body_children.last }
 
-      # The nested `inside` unit can only survive if the enclosing `<group>` was preserved verbatim.
-      expect(reparsed.xpath("//*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(%w[top inside])
+      it 'keeps the <group> as a single wrapper after the entry' do
+        expect(body_children.map(&:name)).to eq(%w[trans-unit group])
+      end
+
+      it "preserves the group's id" do
+        expect(group['id']).to eq 'g1'
+      end
+
+      it 'keeps the nested <trans-unit> inside the group' do
+        expect(group.xpath("./*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(['inside'])
+      end
+
+      it "preserves the nested unit's source text" do
+        expect(group.xpath(".//*[local-name()='source']").text).to eq 'nested'
+      end
     end
 
     it 'detaches preserved <body> nodes from the source document so it can be freed' do

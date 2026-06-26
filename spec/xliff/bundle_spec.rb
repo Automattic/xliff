@@ -113,13 +113,33 @@ RSpec.describe Xliff::Bundle do
     end
 
     # Content survival, not byte-identity: a `<group>` in a namespaced document is re-emitted with a
-    # redundant `xmlns` and after the file's entries, so this asserts the nested unit survives rather than
-    # a byte-for-byte round trip (full fidelity is tracked in #16/#17).
-    it 'preserves a namespaced <group> and its nested <trans-unit> through a round-trip' do
-      bundle = described_class.from_string(sample_file_contents('xcode-with-group.xliff'))
-      reparsed = Nokogiri::XML(bundle.to_s)
+    # redundant `xmlns` and after the file's entries (full fidelity is tracked in #16/#17). These assert the
+    # group survives as a single wrapper carrying its id and its nested source/target text — not merely that
+    # a `trans-unit` with the right id exists somewhere in the output.
+    context 'when round-tripping a namespaced <group>' do
+      let(:reparsed) { Nokogiri::XML(described_class.from_string(sample_file_contents('xcode-with-group.xliff')).to_s) }
+      let(:body_children) { reparsed.xpath("//*[local-name()='body']/*") }
+      let(:nested) { body_children.last.xpath("./*[local-name()='trans-unit']").first }
 
-      expect(reparsed.xpath("//*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(%w[top nested])
+      it 'keeps the <group> as a single wrapper after the entry' do
+        expect(body_children.map(&:name)).to eq(%w[trans-unit group])
+      end
+
+      it "preserves the group's id" do
+        expect(body_children.last['id']).to eq 'g1'
+      end
+
+      it "preserves the nested unit's id" do
+        expect(nested['id']).to eq 'nested'
+      end
+
+      it "preserves the nested unit's source text" do
+        expect(nested.xpath("./*[local-name()='source']").text).to eq 'Nested'
+      end
+
+      it "preserves the nested unit's target text" do
+        expect(nested.xpath("./*[local-name()='target']").text).to eq 'Imbriqué'
+      end
     end
   end
 
