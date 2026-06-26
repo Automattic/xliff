@@ -73,7 +73,9 @@
   with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.
 - `Xliff::Header.new` now rejects an `element:` (and, likewise, an attribute name) that is not a valid XML
   name when building by hand — e.g. one containing a space, which previously serialized to unparseable/malformed
-  XML with no error. Common hyphenated, namespace-prefixed, and Unicode names are accepted. Names from a parsed
+  XML with no error. Common hyphenated and Unicode names are accepted, as is the `xml:` prefix (the one prefix
+  bound in every context); any other namespace prefix is rejected, because the library has no way to declare it
+  and would otherwise emit an undeclared-prefix document (e.g. a hand-built `custom:thing`). Names from a parsed
   document are trusted as-is rather than re-validated (Nokogiri already validated them), so a valid-but-exotic
   parsed name — e.g. an NFD-decomposed accent — no longer crashes the parse. A non-`String` element (e.g. a
   `Symbol`) is coerced to a `String` so it serializes cleanly instead of crashing at write time.

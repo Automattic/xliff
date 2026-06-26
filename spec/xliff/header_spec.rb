@@ -19,6 +19,22 @@ RSpec.describe Xliff::Header do
         .to raise_error(/Invalid Header attribute name/)
     end
 
+    it 'rejects an element name carrying a namespace prefix it cannot bind' do
+      expect { described_class.new(element: 'custom:thing') }.to raise_error(/Invalid Header element name/)
+    end
+
+    it 'rejects an attribute name carrying a namespace prefix it cannot bind' do
+      expect { described_class.new(element: 'tool', attributes: { 'custom:attr' => 'x' }) }
+        .to raise_error(/Invalid Header attribute name/)
+    end
+
+    # `xml:` is the one prefix bound in every context (the XML spec reserves it), so a hand-built `xml:lang`
+    # serializes to well-formed XML — unlike any other prefix, which the library has no way to declare.
+    it 'accepts (and round-trips) an `xml:`-prefixed attribute name' do
+      expect(described_class.new(element: 'note', attributes: { 'xml:lang' => 'en' }).to_s)
+        .to eq '<note xml:lang="en"/>'
+    end
+
     it 'coerces a non-string element so it serializes cleanly instead of raising' do
       expect(described_class.new(element: :tool).to_s).to eq '<tool/>'
     end

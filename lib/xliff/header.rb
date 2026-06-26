@@ -7,11 +7,14 @@ module Xliff
   #
   # Headers have an element and a set of key/value pairs encoded as XML attributes.
   class Header
-    # A valid (optionally namespace-prefixed) XML name. Used to reject obviously-malformed names supplied on
-    # the build-by-hand path (e.g. one containing a space). Names that come from a parsed document are trusted
-    # rather than re-checked against this — see {.from_xml} — because Nokogiri has already validated them and
-    # this pattern intentionally doesn't enumerate every exotic XML 1.0 name character.
-    VALID_ELEMENT_NAME = /\A[[:alpha:]_][[:alnum:]_.-]*(?::[[:alpha:]_][[:alnum:]_.-]*)?\z/
+    # A valid XML name the library can actually serialize: an unprefixed name, or one carrying the `xml:`
+    # prefix — the only prefix bound in every context, including a standalone {Header#to_s}. Used to reject
+    # names supplied on the build-by-hand path that can't be emitted as well-formed XML: one containing a
+    # space, or one carrying a namespace prefix the library has no way to bind (e.g. `custom:thing`, which
+    # would serialize to a document with an undeclared `custom:` prefix). Names from a parsed document are
+    # trusted rather than re-checked — see {.from_xml} — because Nokogiri has already validated them and this
+    # pattern intentionally doesn't enumerate every exotic XML 1.0 name character.
+    VALID_ELEMENT_NAME = /\A(?:xml:)?[[:alpha:]_][[:alnum:]_.-]*\z/
     private_constant :VALID_ELEMENT_NAME
 
     # This header's element
