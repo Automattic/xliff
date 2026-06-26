@@ -30,6 +30,14 @@ RSpec.describe Xliff::File do
       expect(new_file(source_language: :en).source_language).to eq 'en'
     end
 
+    it 'strips surrounding whitespace from the original (matching Entry#id)' do
+      expect(new_file(original: '  info.plist  ').original).to eq 'info.plist'
+    end
+
+    it 'strips surrounding whitespace from the source_language' do
+      expect(new_file(source_language: '  en  ').source_language).to eq 'en'
+    end
+
     describe 'the original attribute' do
       def set(value)
         new_file(original: value)

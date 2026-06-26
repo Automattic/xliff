@@ -187,6 +187,15 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.file_named('InfoPlist.strings').original).to eq 'Resources/en.lproj/InfoPlist.strings'
     end
 
+    # Regression: a padded `original` used to be stored verbatim, so its basename never matched the clean
+    # lookup name. The original is now stripped on construction, so the basename match holds.
+    it 'finds a file built with a padded original by its basename' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: '  Resources/en.lproj/InfoPlist.strings  '))
+
+      expect(bundle.file_named('InfoPlist.strings').original).to eq 'Resources/en.lproj/InfoPlist.strings'
+    end
+
     it 'returns nil without raising when a full-path file does not match' do
       bundle = described_class.new
       bundle.add_file(new_file(original: 'Resources/en.lproj/InfoPlist.strings'))

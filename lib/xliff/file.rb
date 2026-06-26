@@ -53,10 +53,11 @@ module Xliff
     # Most often used to build an XLIFF file by hand.
     #
     # @param [#to_s] original The original file name. Required by XLIFF 1.2; must not be blank. Coerced to a
-    #   `String` (XML attribute values always are), matching {Entry#id}, so a non-`String` value such as an
-    #   integer doesn't later crash {Bundle#file_named} on `::File.basename`.
+    #   stripped `String` (XML attribute values always are), matching {Entry#id}, so a non-`String` value
+    #   such as an integer doesn't later crash {Bundle#file_named} on `::File.basename`, and surrounding
+    #   whitespace neither leaks into output nor defeats a {Bundle#file_named} basename match.
     # @param [#to_s] source_language The locale code for the source language. Required; must not be blank.
-    #   Coerced to a `String` to match `original`.
+    #   Coerced to a stripped `String` to match `original`.
     # @param [String, nil] target_language The locale code for the translated language. Optional in XLIFF 1.2,
     #   so an absent (or blank) value becomes `nil` and no `target-language` attribute is emitted.
     # @param [String] datatype The type of data represented. An absent (or blank) value defaults to `plaintext`.
@@ -65,8 +66,8 @@ module Xliff
       raise ArgumentError, 'File `original` must not be blank' if Xliff.blank?(original)
       raise ArgumentError, 'File `source-language` must not be blank' if Xliff.blank?(source_language)
 
-      @original = original.to_s
-      @source_language = source_language.to_s
+      @original = original.to_s.strip
+      @source_language = source_language.to_s.strip
       @target_language = Xliff.presence(target_language)
       @datatype = Xliff.presence(datatype) || 'plaintext'
 
