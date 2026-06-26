@@ -86,6 +86,20 @@ RSpec.describe Xliff::File do
       expect(file.entry_with_id(1234).id).to eq '1234'
     end
 
+    it 'finds an entry whose id was built with surrounding whitespace by its bare value' do
+      file = new_file
+      file.add_entry(new_entry(id: '  spaced  '))
+
+      expect(file.entry_with_id('spaced').id).to eq 'spaced'
+    end
+
+    it 'finds an entry by an id looked up with incidental surrounding whitespace' do
+      file = new_file
+      file.add_entry(new_entry(id: 'spaced'))
+
+      expect(file.entry_with_id('  spaced  ').id).to eq 'spaced'
+    end
+
     it 'returns nil if not found' do
       file = new_file
       expect(file.entry_with_id('1234')).to be_nil

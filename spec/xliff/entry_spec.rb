@@ -26,6 +26,10 @@ RSpec.describe Xliff::Entry do
       expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
     end
 
+    it 'strips surrounding whitespace from the id so it stays findable by its bare value' do
+      expect(described_class.new(id: '  x  ', source: 'source').id).to eq('x')
+    end
+
     describe 'a blank id' do
       def set(value)
         described_class.new(id: value, source: 'source')
@@ -46,6 +50,12 @@ RSpec.describe Xliff::Entry do
       entry = new_entry
       entry.id = 5678
       expect(entry.id).to eq('5678')
+    end
+
+    it 'strips surrounding whitespace from an assigned id' do
+      entry = new_entry
+      entry.id = '  y  '
+      expect(entry.id).to eq('y')
     end
 
     describe 'a blank id' do

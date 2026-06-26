@@ -47,12 +47,14 @@ module Xliff
       self.xml_space = xml_space
     end
 
-    # Set the unique identifier, coercing the value to a `String`
+    # Set the unique identifier, coercing the value to a stripped `String`
     #
     # XML attributes are always strings, so coercing here keeps `id` consistent whether it was built by hand
-    # (e.g. with an integer) or parsed back from a document. A blank `id` (empty or whitespace-only) is
-    # rejected: it is meaningless as a unique identifier, and an empty one would collide for every id-less
-    # entry under {File#entry_with_id}.
+    # (e.g. with an integer) or parsed back from a document. Surrounding whitespace is stripped so storage
+    # agrees with the blank check (which strips before testing) and with the {File#entry_with_id} lookup
+    # (which strips too) — otherwise an `id` of `" x "` would be stored padded yet be unfindable by `"x"`.
+    # A blank `id` (empty or whitespace-only) is rejected: it is meaningless as a unique identifier, and an
+    # empty one would collide for every id-less entry under {File#entry_with_id}.
     #
     # @param [#to_s] value The new identifier.
     # @raise [ArgumentError] If the coerced value is blank (empty or whitespace-only).
@@ -60,7 +62,7 @@ module Xliff
     def id=(value)
       raise ArgumentError, 'Entry `id` must not be blank' if Xliff.blank?(value)
 
-      @id = value.to_s
+      @id = value.to_s.strip
     end
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`

@@ -68,6 +68,10 @@
   `Xliff::Entry#id`. A `File` built with a non-`String` `original` (e.g. an integer) previously crashed
   `Bundle#file_named` with a `TypeError` from `::File.basename` — the value was stored uncoerced, so every
   lookup fell through to the basename comparison and raised.
+- `Xliff::Entry` now strips surrounding whitespace from its `id` — on construction, on assignment, and in the
+  `File#entry_with_id` lookup — so what is stored agrees with the blank check (which already strips before
+  testing). An `id` of `" x "` was previously stored padded yet missed by `entry_with_id("x")`; it now
+  normalizes to `"x"` consistently.
 - `Xliff::Header.new` now requires its `element:` argument (matching `Xliff::Entry`'s `id:` and
   `Xliff::File`'s `original:`). Building a header without one previously constructed fine and then crashed
   with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.

@@ -97,10 +97,11 @@ module Xliff
 
     # Find the first entry with a given `id`, if present
     #
-    # @param [#to_s] id The `id` to search for. Coerced to a `String` to match how {Entry} stores its `id`.
+    # @param [#to_s] id The `id` to search for. Coerced to a stripped `String` to match how {Entry} stores
+    #   its `id`, so incidental surrounding whitespace doesn't cause a miss.
     # @return [Xliff::Entry, nil]
     def entry_with_id(id)
-      id = id.to_s
+      id = id.to_s.strip
       @entries.find do |entry|
         entry.id == id
       end
