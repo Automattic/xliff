@@ -195,6 +195,28 @@ RSpec.describe Xliff::Bundle do
       it { is_expected.to conform_to_xliff_schema(:transitional) }
     end
 
+    context 'with a from-scratch file that has a header' do
+      # Guards the build-by-hand `File#add_header` → `add_headers_to_file` emission path: every other
+      # from-scratch example builds a header-less file, so this is otherwise only exercised by the
+      # parse-then-re-emit round-trip samples. `build-num` is omitted because it is transitional-only.
+      subject(:output) do
+        bundle = described_class.new
+        file = Xliff::File.new(original: 'info.plist', source_language: 'en', target_language: 'fr')
+        header = Xliff::Header.new(element: 'tool', attributes: { 'tool-id' => 'example', 'tool-name' => 'Xcode' })
+        file.add_header(header)
+        file.add_entry(Xliff::Entry.new(id: 1234, source: 'hello', target: 'bonjour'))
+        bundle.add_file(file)
+        bundle.to_s
+      end
+
+      it { is_expected.to conform_to_xliff_schema(:strict) }
+      it { is_expected.to conform_to_xliff_schema(:transitional) }
+
+      it 'emits the header before the body' do
+        expect(Nokogiri::XML(output).xpath("//*[local-name()='file']/*").map(&:name)).to eq(%w[header body])
+      end
+    end
+
     context 'with a source-only (untranslated) document' do
       # No target-language and no <target> — the Xcode-untranslated shape this PR adds must stay schema-valid.
       subject(:output) do
