@@ -22,6 +22,14 @@ RSpec.describe Xliff::Entry do
       expect(described_class.new(id: 'x', source: 'Hello').target).to be_nil
     end
 
+    it 'rejects a nil source (a <trans-unit> must carry a <source>)' do
+      expect { described_class.new(id: 'x', source: nil) }.to raise_error(ArgumentError, /source/)
+    end
+
+    it 'tolerates an empty source, matching the parse path' do
+      expect(described_class.new(id: 'x', source: '').source).to eq ''
+    end
+
     it 'coerces the id to a String' do
       expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
     end
@@ -72,6 +80,10 @@ RSpec.describe Xliff::Entry do
       entry = new_entry
       entry.source = 'new-source'
       expect(entry.source).to eq 'new-source'
+    end
+
+    it 'rejects a nil source' do
+      expect { new_entry.source = nil }.to raise_error(ArgumentError, /source/)
     end
   end
 

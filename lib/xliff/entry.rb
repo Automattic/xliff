@@ -15,7 +15,7 @@ module Xliff
 
     # The original text
     # @return [String]
-    attr_accessor :source
+    attr_reader :source
 
     # The translated text
     # @return [String, nil]
@@ -41,7 +41,7 @@ module Xliff
     # @param [String] xml_space The XML whitespace processing behaviour.
     def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
       self.id = id
-      @source = source
+      self.source = source
       @target = target
       @note = note
       self.xml_space = xml_space
@@ -63,6 +63,23 @@ module Xliff
       raise ArgumentError, 'Entry `id` must not be blank' if Xliff.blank?(value)
 
       @id = value.to_s.strip
+    end
+
+    # Set the source text, rejecting a `nil` value
+    #
+    # `source` is the original string a `<trans-unit>` must carry, so a `nil` is rejected here and on
+    # assignment — the way {#id=} rejects a blank id and {File} rejects a blank `original` — rather than
+    # silently emitting an empty `<source/>`. An empty string is tolerated, mirroring {.from_xml}, which
+    # accepts an empty `<source>` element (liberal on read). Unlike {#id}, surrounding whitespace is kept:
+    # source text can be significant under `xml:space="preserve"`.
+    #
+    # @param [String] value The new source text.
+    # @raise [ArgumentError] If `value` is `nil`.
+    # @return [void]
+    def source=(value)
+      raise ArgumentError, 'Entry `source` must not be nil' if value.nil?
+
+      @source = value
     end
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`
