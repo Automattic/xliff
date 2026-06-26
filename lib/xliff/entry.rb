@@ -58,10 +58,9 @@ module Xliff
     # @raise [ArgumentError] If the coerced value is blank (empty or whitespace-only).
     # @return [void]
     def id=(value)
-      coerced = value.to_s
-      raise ArgumentError, 'Entry `id` must not be blank' if coerced.strip.empty?
+      raise ArgumentError, 'Entry `id` must not be blank' if Xliff.blank?(value)
 
-      @id = coerced
+      @id = value.to_s
     end
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`
@@ -123,7 +122,7 @@ module Xliff
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
       raise 'Invalid Entry XML – the root node must be `<trans-unit>`' if xml.name != 'trans-unit'
-      raise 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute' if xml['id'].to_s.strip.empty?
+      raise 'Invalid Entry XML – `<trans-unit>` has a missing or blank `id` attribute' if Xliff.blank?(xml['id'])
       raise 'Invalid Entry XML – `<trans-unit>` is missing a `<source>` element' if xml.child_element('source').nil?
     end
   end

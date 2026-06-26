@@ -30,12 +30,20 @@ RSpec.describe Xliff::File do
       expect { new_file(original: '') }.to raise_error(ArgumentError, /original/)
     end
 
+    it 'rejects a whitespace-only original' do
+      expect { new_file(original: '   ') }.to raise_error(ArgumentError, /original/)
+    end
+
     it 'rejects a nil source_language' do
       expect { new_file(source_language: nil) }.to raise_error(ArgumentError, /source-language/)
     end
 
     it 'rejects an empty source_language' do
       expect { new_file(source_language: '') }.to raise_error(ArgumentError, /source-language/)
+    end
+
+    it 'rejects a whitespace-only source_language' do
+      expect { new_file(source_language: '   ') }.to raise_error(ArgumentError, /source-language/)
     end
 
     it 'treats an empty target_language as absent' do
@@ -109,6 +117,18 @@ RSpec.describe Xliff::File do
     it 'raises when the required `source-language` attribute is missing' do
       exp = 'Invalid File XML – `<file>` is missing the required `source-language` attribute'
       expect { described_class.from_xml(parse_xml('<file original="x"><body/></file>')) }.to raise_exception exp
+    end
+
+    it 'raises when the `original` attribute is present but only whitespace' do
+      exp = 'Invalid File XML – `<file>` is missing the required `original` attribute'
+      expect { described_class.from_xml(parse_xml('<file original="   " source-language="en"><body/></file>')) }
+        .to raise_exception exp
+    end
+
+    it 'raises when the `source-language` attribute is present but only whitespace' do
+      exp = 'Invalid File XML – `<file>` is missing the required `source-language` attribute'
+      expect { described_class.from_xml(parse_xml('<file original="x" source-language="   "><body/></file>')) }
+        .to raise_exception exp
     end
 
     it 'parses the `original` correctly' do

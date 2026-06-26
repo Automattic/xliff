@@ -40,10 +40,10 @@
   schema-invalid output. The optional `<header>` is still omitted when empty.
 - `Xliff::Bundle#file_named` no longer raises `NameError` when matching a file by basename (e.g. looking up
   `InfoPlist.strings` against an Xcode `original` path of `Resources/en.lproj/InfoPlist.strings`).
-- `Xliff::File` now requires a non-empty `original` and `source-language`, rejecting them both on construction
-  and when parsing (`File.from_xml`) instead of serializing a missing required attribute to an invalid
-  `original=""` / `source-language=""`. (Previously a `nil` `original` was tolerated and skipped by
-  `Bundle#file_named`; it is now prevented at the source.)
+- `Xliff::File` now requires a non-blank `original` and `source-language` – rejecting an empty or
+  whitespace-only value – both on construction and when parsing (`File.from_xml`), instead of serializing a
+  missing required attribute to an invalid `original=""` / `source-language="   "`. (Previously a `nil`
+  `original` was tolerated and skipped by `Bundle#file_named`; it is now prevented at the source.)
 - `Xliff::Bundle.from_string`/`from_path` now raise the documented `Invalid XLIFF file` error for empty,
   whitespace-only, or otherwise root-less input instead of leaking an internal `NoMethodError`.
 - A `<file>` parsed without (or with a blank) `datatype` attribute now falls back to the documented

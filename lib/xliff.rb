@@ -3,12 +3,27 @@
 # Namespace for classes and modules that handle building and parsing XLIFF files.
 # @api public
 module Xliff
-  # Return `value` unless it is blank – empty or whitespace-only – in which case return `nil`.
+  # Whether `value` is blank – `nil`, empty, or whitespace-only once coerced to a `String`.
   #
-  # Centralises the "a blank value falls back to the default" rule shared by the optional, defaultable
-  # attributes – `xml:space`, `datatype`, `target-language`, and `xsi:schemaLocation` – so a caller reads
-  # as `Xliff.presence(value) || default`. Whitespace-only counts as blank (matching {Xliff::Entry#id=}), so
-  # it can't slip through as an invalid `xml:space="   "` / `target-language="   "` / `xsi:schemaLocation="   "`.
+  # The single definition of "blank" shared across the library so the rule is applied uniformly: a required
+  # attribute (`<file>`'s `original`/`source-language`, an {Entry}'s `id`) is rejected when blank, and an
+  # optional, defaultable one (`xml:space`, `datatype`, `target-language`, `xsi:schemaLocation`) falls back to
+  # its default. Whitespace-only counts as blank, so a value like `"   "` can't slip through as a schema-invalid
+  # `source-language="   "` / `target-language="   "`.
+  #
+  # @api private
+  # @param [String, nil] value The value to test.
+  # @return [Boolean] `true` when `value` is `nil`, empty, or whitespace-only.
+  # @example Detect a whitespace-only value
+  #   Xliff.blank?('   ') #=> true
+  def self.blank?(value)
+    value.to_s.strip.empty?
+  end
+
+  # Return `value` unless it is blank, in which case return `nil`.
+  #
+  # The counterpart to {.blank?} for the optional, defaultable attributes, so a caller reads as
+  # `Xliff.presence(value) || default`. See {.blank?} for the definition of blank.
   #
   # @api private
   # @param [String, nil] value The value to coerce.
@@ -16,7 +31,7 @@ module Xliff
   # @example Fall back to a default for a blank value
   #   Xliff.presence('   ') || 'default' #=> "default"
   def self.presence(value)
-    value.to_s.strip.empty? ? nil : value
+    blank?(value) ? nil : value
   end
 end
 

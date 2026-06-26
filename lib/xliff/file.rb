@@ -52,15 +52,15 @@ module Xliff
     #
     # Most often used to build an XLIFF file by hand.
     #
-    # @param [String] original The original file name. Required by XLIFF 1.2; must not be empty.
-    # @param [String] source_language The locale code for the source language. Required; must not be empty.
+    # @param [String] original The original file name. Required by XLIFF 1.2; must not be blank.
+    # @param [String] source_language The locale code for the source language. Required; must not be blank.
     # @param [String, nil] target_language The locale code for the translated language. Optional in XLIFF 1.2,
     #   so an absent (or blank) value becomes `nil` and no `target-language` attribute is emitted.
     # @param [String] datatype The type of data represented. An absent (or blank) value defaults to `plaintext`.
-    # @raise [ArgumentError] If `original` or `source_language` is empty.
+    # @raise [ArgumentError] If `original` or `source_language` is blank (empty or whitespace-only).
     def initialize(original:, source_language:, target_language: nil, datatype: 'plaintext')
-      raise ArgumentError, 'File `original` must not be empty' if original.to_s.empty?
-      raise ArgumentError, 'File `source-language` must not be empty' if source_language.to_s.empty?
+      raise ArgumentError, 'File `original` must not be blank' if Xliff.blank?(original)
+      raise ArgumentError, 'File `source-language` must not be blank' if Xliff.blank?(source_language)
 
       @original = original
       @source_language = source_language
@@ -163,7 +163,7 @@ module Xliff
       raise 'Invalid File XML – the root node must be `<file>`' if xml.name != 'file'
 
       %w[original source-language].each do |attr|
-        raise "Invalid File XML – `<file>` is missing the required `#{attr}` attribute" if xml[attr].to_s.empty?
+        raise "Invalid File XML – `<file>` is missing the required `#{attr}` attribute" if Xliff.blank?(xml[attr])
       end
     end
 
