@@ -28,11 +28,15 @@ module Xliff
     #
     # @param [#to_s] element The XML element to use.
     # @param [String: String] attributes Any attributes that should be set on the header.
-    def initialize(element:, attributes: {})
-      raise "Invalid Header element name – #{element.inspect}" unless element.to_s.match?(VALID_ELEMENT_NAME)
+    # @param [Boolean] validate Whether to reject names that aren't valid XML names. Defaults to `true`;
+    #   {.from_xml} passes `false` to accept a parsed document's already-validated names as-is.
+    def initialize(element:, attributes: {}, validate: true)
+      if validate
+        raise "Invalid Header element name – #{element.inspect}" unless element.to_s.match?(VALID_ELEMENT_NAME)
 
-      attributes.each_key do |key|
-        raise "Invalid Header attribute name – #{key.inspect}" unless key.to_s.match?(VALID_ELEMENT_NAME)
+        attributes.each_key do |key|
+          raise "Invalid Header attribute name – #{key.inspect}" unless key.to_s.match?(VALID_ELEMENT_NAME)
+        end
       end
 
       @element = element.to_s
@@ -62,10 +66,10 @@ module Xliff
 
     # Decode the given XML into an {Xliff::Header} object, if possible
     #
-    # Raises for invalid input. The element and attribute names come straight from a parsed document, so they
-    # are used as-is rather than run through the build-time name validation in {#initialize} — Nokogiri has
-    # already validated them, and re-checking would wrongly reject valid-but-exotic XML names (e.g. an
-    # NFD-decomposed accent), crashing the parse.
+    # Raises for invalid input. The element and attribute names come straight from a parsed document, so
+    # {#initialize} is called with `validate: false` and uses them as-is — Nokogiri has already validated
+    # them, and re-checking would wrongly reject valid-but-exotic XML names (e.g. an NFD-decomposed accent),
+    # crashing the parse.
     #
     # @param [Nokogiri::XML::Element] xml An XLIFF header fragment.
     # @return [Header]
@@ -73,10 +77,7 @@ module Xliff
       raise 'Header XML is nil' if xml.nil?
       raise "Invalid Header XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element
 
-      header = allocate
-      header.instance_variable_set(:@element, xml.name)
-      header.instance_variable_set(:@attributes, attributes_from(xml))
-      header
+      new(element: xml.name, attributes: attributes_from(xml), validate: false)
     end
 
     # Read a header element's attributes into a `{ "prefix:name" => value }` hash, keeping namespace prefixes
