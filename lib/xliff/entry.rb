@@ -115,10 +115,11 @@ module Xliff
       )
     end
 
-    # Validate the given XML to ensure that it's a valid `<trans-unit>` element, returning its `<source>`
+    # Validate the given XML to ensure that it's a valid `<trans-unit>` element
     #
-    # @return [Nokogiri::XML::Element] The validated `<source>` element, so {.from_xml} can read it without
-    #   scanning the children a second time.
+    # Returns the located `<source>` so {.from_xml} can read it without scanning the children a second time.
+    #
+    # @return [Nokogiri::XML::Element] The validated `<source>` element.
     def self.validate_source_xml(xml)
       raise 'Entry XML is nil' if xml.nil?
       raise "Invalid Entry XML – must be a nokogiri object, got `#{xml.class}`" unless xml.is_a? Nokogiri::XML::Element

@@ -3,9 +3,10 @@
 # Namespace for classes and modules that handle building and parsing XLIFF files.
 # @api public
 module Xliff
-  # Whether `value` is blank – `nil`, empty, or whitespace-only once coerced to a `String`.
+  # Whether `value` is blank once coerced to a `String`
   #
-  # The single definition of "blank" shared across the library so the rule is applied uniformly: a required
+  # Blank means `nil`, empty, or whitespace-only. The single definition of "blank" shared across the library
+  # so the rule is applied uniformly: a required
   # attribute (`<file>`'s `original`/`source-language`, an {Entry}'s `id`) is rejected when blank, and an
   # optional, defaultable one (`xml:space`, `datatype`, `target-language`, `xsi:schemaLocation`) falls back to
   # its default. Whitespace-only counts as blank, so a value like `"   "` can't slip through as a schema-invalid
