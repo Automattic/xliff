@@ -224,6 +224,22 @@ RSpec.describe Xliff::Bundle do
 
       expect(bundle.file_named('1234').original).to eq '1234'
     end
+
+    # Regression: the lookup argument was compared uncoerced, so an integer name missed a file whose
+    # `original` was the coerced equivalent — asymmetric with the integer-built `File#entry_with_id` query.
+    it 'finds a file by a non-String lookup argument matching its coerced original' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 1234))
+
+      expect(bundle.file_named(1234).original).to eq '1234'
+    end
+
+    it 'finds a file by a name looked up with incidental surrounding whitespace' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 'InfoPlist.strings'))
+
+      expect(bundle.file_named('  InfoPlist.strings  ').original).to eq 'InfoPlist.strings'
+    end
   end
 
   # Guards the central conformance guarantee: serialized output validates against the official OASIS XLIFF 1.2

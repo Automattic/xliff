@@ -84,7 +84,9 @@ module Xliff
     #
     # If two files exist with the same name, only the first will be returned.
     #
-    # @param [String] name The name of the file to locate. If found it is returned.
+    # @param [#to_s] name The name of the file to locate. Coerced to a stripped `String` to match how {File}
+    #   stores its `original` (see {File#initialize}), mirroring {File#entry_with_id}, so a non-`String` name
+    #   and incidental surrounding whitespace don't cause a miss. If found it is returned.
     # @example Look up an existing file
     #   # Bundle contains two files: [foo.txt, bar.txt]
     #   bundle.file_named('foo.txt') => {File}
@@ -93,6 +95,7 @@ module Xliff
     #   bundle.file_named('baz.txt') => nil
     # @return [File, nil] The file, if found.
     def file_named(name)
+      name = name.to_s.strip
       @files.find do |file|
         file.original == name || ::File.basename(file.original) == name
       end
