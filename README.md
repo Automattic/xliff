@@ -52,7 +52,7 @@ In the above example, `xml` reads:
 
 ## Conformance and limitations
 
-Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas. The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved from the source document when round-tripping. For a document that uses only the structure and attributes the library models – as Xcode's exports do – reading and re-writing it is byte-for-byte unchanged. The library models a fixed attribute set per element and re-emits those attributes in a canonical order (see the limitations below); a document carrying other attributes – or the modeled ones in a different order – round-trips its content but not byte-for-byte.
+Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas, and round-tripped Xcode exports against the transitional schema – all verified by the test suite against the official OASIS XSDs (`bundle exec rake conformance`). The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved from the source document when round-tripping. For a document that uses only the structure and attributes the library models – as Xcode's exports do – reading and re-writing it is byte-for-byte unchanged. The library models a fixed attribute set per element and re-emits those attributes in a canonical order (see the limitations below); a document carrying other attributes – or the modeled ones in a different order – round-trips its content but not byte-for-byte.
 
 A few things worth knowing:
 
@@ -66,7 +66,7 @@ A few things worth knowing:
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rake spec` to run the tests. You can also run `bundle exec console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rake spec` to run the tests; `bundle exec rake conformance` runs just the schema-conformance examples, validating serialized output against the vendored OASIS XLIFF 1.2 XSDs in `spec/schemas`. You can also run `bundle exec console` for an interactive prompt that will allow you to experiment.
 
 ## Contributing
 
