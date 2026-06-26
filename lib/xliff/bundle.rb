@@ -163,7 +163,7 @@ module Xliff
     # @param [Nokogiri::XML::Element] xml A Nokogiri XML document containing XLIFF data.
     # @return [Bundle]
     def self.from_xml(xml)
-      raise if xml.nil?
+      raise 'Bundle XML is nil' if xml.nil?
 
       root = xml.document.root
       raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'

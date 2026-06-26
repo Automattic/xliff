@@ -85,6 +85,12 @@ RSpec.describe Xliff::Bundle do
     end
   end
 
+  describe '#from_xml' do
+    it 'raises a descriptive error for nil xml, matching the other parsers' do
+      expect { described_class.from_xml(nil) }.to raise_exception 'Bundle XML is nil'
+    end
+  end
+
   describe '.path=' do
     it 'stores the path correctly' do
       bundle = described_class.new
