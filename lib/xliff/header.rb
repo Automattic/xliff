@@ -11,7 +11,7 @@ module Xliff
     # the build-by-hand path (e.g. one containing a space). Names that come from a parsed document are trusted
     # rather than re-checked against this — see {.from_xml} — because Nokogiri has already validated them and
     # this pattern intentionally doesn't enumerate every exotic XML 1.0 name character.
-    VALID_ELEMENT_NAME = /\A[[:alpha:]_][[:alnum:]_.-]*(?::[[:alpha:]_][[:alnum:]_.-]*)?\z/.freeze
+    VALID_ELEMENT_NAME = /\A[[:alpha:]_][[:alnum:]_.-]*(?::[[:alpha:]_][[:alnum:]_.-]*)?\z/
     private_constant :VALID_ELEMENT_NAME
 
     # This header's element
