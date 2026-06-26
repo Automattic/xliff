@@ -20,6 +20,13 @@
   byte-for-byte: nodes are re-emitted after the file's entries, and a moved node in a namespaced document may
   gain a redundant namespace declaration. First-class support is tracked in
   [#17](https://github.com/Automattic/xliff/issues/17).
+- `Xliff::Header#child_nodes` preserves a parsed header element's child content — text and nested elements,
+  such as an `<skl>` skeleton's `<internal-file>` — that the library doesn't model. The nodes are deep-copied
+  out of the source document on parse (so it isn't retained) and re-emitted on write, instead of being
+  dropped. (Previously `Xliff::Header` modeled only an element name and its attributes, so a `<header>`
+  carrying a skeleton round-tripped to an empty element, silently losing it.) As with `<group>`, the content
+  survives but isn't reproduced byte-for-byte: a moved node in a namespaced document may gain a redundant
+  namespace declaration. A header built by hand carries no child content.
 
 ### Fixed
 

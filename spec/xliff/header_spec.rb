@@ -54,6 +54,10 @@ RSpec.describe Xliff::Header do
     it 'coerces attribute keys to strings (matching parsed headers)' do
       expect(described_class.new(element: 'foo', attributes: { sym: 'v' }).attributes).to eq('sym' => 'v')
     end
+
+    it 'has no child nodes when built by hand' do
+      expect(described_class.new(element: 'tool').child_nodes).to be_empty
+    end
   end
 
   describe '.to_xml' do
@@ -124,6 +128,37 @@ RSpec.describe Xliff::Header do
 
     it 'accepts a Unicode element name (a valid XML name) on parse' do
       expect(described_class.from_xml(parse_xml('<café tool-id="x"/>')).element).to eq 'café'
+    end
+
+    context 'when the header element has child content the library does not model' do
+      # e.g. an <skl> skeleton wrapping an <internal-file>: preserved verbatim (deep-copied) rather than
+      # modeled, mirroring how <group>/<bin-unit> are kept in the body. See #17/#18.
+      let(:skl) do
+        parse_xml('<root xmlns="urn:oasis:names:tc:xliff:document:1.2">' \
+                  '<skl xml:space="preserve"><internal-file>SKELETON</internal-file></skl></root>')
+          .element_children.first
+      end
+
+      it 'exposes the preserved child nodes' do
+        expect(described_class.from_xml(skl).child_nodes.map(&:name)).to eq(['internal-file'])
+      end
+
+      it 'detaches them from the source document so it can be freed' do
+        expect(described_class.from_xml(skl).child_nodes.first.document).not_to be(skl.document)
+      end
+
+      it 're-emits the nested content on write' do
+        expect(described_class.from_xml(skl).to_s).to include('<internal-file', 'SKELETON')
+      end
+
+      it 're-emits well-formed XML' do
+        expect(Nokogiri::XML(described_class.from_xml(skl).to_s, &:strict).errors).to be_empty
+      end
+
+      it "preserves a header child's direct text content" do
+        note = parse_xml('<root><note>just text</note></root>').element_children.first
+        expect(described_class.from_xml(note).to_s).to eq '<note>just text</note>'
+      end
     end
   end
 

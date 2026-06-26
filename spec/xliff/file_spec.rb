@@ -228,6 +228,13 @@ RSpec.describe Xliff::File do
                       '<body><trans-unit id="real" xml:space="default"><source>Hi</source></trans-unit></body></file>')
       expect(described_class.from_xml(xml).entries.map(&:id)).to eq(['real'])
     end
+
+    it 'preserves a header skeleton (<skl>) through a round-trip' do
+      xml = parse_xml('<file original="a" source-language="en" datatype="plaintext">' \
+                      '<header><skl><internal-file>SKEL</internal-file></skl></header>' \
+                      '<body/></file>')
+      expect(described_class.from_xml(xml).to_s).to include('<internal-file', 'SKEL')
+    end
   end
 
   describe '.to_xml' do
