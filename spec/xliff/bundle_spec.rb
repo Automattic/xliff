@@ -112,6 +112,28 @@ RSpec.describe Xliff::Bundle do
       expect { described_class.new.to_xml }.to raise_error(/at least one/)
     end
 
+    # Regression: a parsed header attribute under a prefix the library can't declare (anything but `xml:`)
+    # used to round-trip to an undeclared-prefix, non-well-formed document. It's dropped on parse now, so the
+    # output re-parses cleanly. See #18.
+    context 'when a header attribute uses a namespace prefix the library cannot declare' do
+      let(:source) do
+        <<~XML
+          <?xml version="1.0" encoding="UTF-8"?>
+          <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xmlns:custom="urn:x">
+            <file original="x" source-language="en" datatype="plaintext">
+              <header><tool tool-id="t" custom:flag="on"/></header>
+              <body/>
+            </file>
+          </xliff>
+        XML
+      end
+
+      it 'round-trips to well-formed XML' do
+        output = described_class.from_string(source).to_s
+        expect(Nokogiri::XML(output, &:strict).errors).to be_empty
+      end
+    end
+
     # Content survival, not byte-identity: a `<group>` in a namespaced document is re-emitted with a
     # redundant `xmlns` and after the file's entries (full fidelity is tracked in #16/#17). These assert the
     # group survives as a single wrapper carrying its id and its nested source/target text — not merely that

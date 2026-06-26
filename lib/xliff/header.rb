@@ -69,10 +69,10 @@ module Xliff
 
     # Decode the given XML into an {Xliff::Header} object, if possible
     #
-    # Raises for invalid input. The element and attribute names come straight from a parsed document, so
-    # {#initialize} is called with `validate: false` and uses them as-is — Nokogiri has already validated
-    # them, and re-checking would wrongly reject valid-but-exotic XML names (e.g. an NFD-decomposed accent),
-    # crashing the parse.
+    # Raises for invalid input. The element name comes straight from a parsed document, so {#initialize} is
+    # called with `validate: false` and uses it as-is — Nokogiri has already validated it, and re-checking
+    # would wrongly reject a valid-but-exotic XML name (e.g. an NFD-decomposed accent), crashing the parse.
+    # Attributes are pre-filtered by {.attributes_from} to those the library can emit.
     #
     # @param [Nokogiri::XML::Element] xml An XLIFF header fragment.
     # @return [Header]
@@ -83,13 +83,24 @@ module Xliff
       new(element: xml.name, attributes: attributes_from(xml), validate: false)
     end
 
-    # Read a header element's attributes into a `{ "prefix:name" => value }` hash, keeping namespace prefixes
+    # Read a header element's emittable attributes into a `{ "name" => value }` hash
+    #
+    # Keeps unprefixed attributes and the one prefix the library can declare on write — `xml:`, which is
+    # bound in every context. An attribute under any other namespace prefix is dropped: the library has no
+    # way to emit its `xmlns` declaration, so preserving it would serialize to an undeclared-prefix,
+    # non-well-formed document. This mirrors the build-by-hand path, which rejects a non-`xml:` prefix
+    # outright. Preserving arbitrary namespaces is tracked in #18.
     #
     # @api private
     # @param [Nokogiri::XML::Element] xml The parsed header element.
     # @return [Hash{String => String}]
     private_class_method def self.attributes_from(xml)
-      xml.attribute_nodes.to_h { |a| [[a.namespace&.prefix, a.name].compact.join(':'), a.value] }
+      xml.attribute_nodes.each_with_object({}) do |attr, attributes|
+        prefix = attr.namespace&.prefix
+        next if prefix && prefix != 'xml'
+
+        attributes[[prefix, attr.name].compact.join(':')] = attr.value
+      end
     end
   end
 end

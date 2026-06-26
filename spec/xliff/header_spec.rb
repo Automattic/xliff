@@ -100,6 +100,23 @@ RSpec.describe Xliff::Header do
       expect(header.to_s).to eq '<note xml:lang="en" foo="bar"/>'
     end
 
+    context 'when a header attribute carries a prefix the library cannot declare' do
+      # Only `xml:` is bound on write, so any other prefix is dropped on parse rather than re-emitted as an
+      # undeclared prefix (non-well-formed XML) — matching the build-by-hand rejection. See #18.
+      let(:tool) do
+        parse_xml('<root xmlns:custom="urn:x"><tool tool-id="t" custom:flag="on" xml:lang="en"/></root>')
+          .element_children.first
+      end
+
+      it 'drops the undeclarable attribute but keeps the rest' do
+        expect(described_class.from_xml(tool).attributes).to eq('tool-id' => 't', 'xml:lang' => 'en')
+      end
+
+      it 're-emits well-formed XML' do
+        expect(Nokogiri::XML(described_class.from_xml(tool).to_s, &:strict).errors).to be_empty
+      end
+    end
+
     it 'accepts a valid-but-exotic XML name (e.g. an NFD-decomposed accent) without re-validating it' do
       name = "caf#{[0x0065, 0x0301].pack('U*')}" # "cafe" + combining acute (NFD) — a valid XML name
       expect(described_class.from_xml(parse_xml("<#{name} v='1'/>")).element).to eq(name)

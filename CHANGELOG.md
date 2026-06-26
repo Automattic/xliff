@@ -57,9 +57,11 @@
   raises for a `<trans-unit>` with no `id`, `id=""`, or `id="  "`) and when building by hand (`Entry.new`/
   `entry.id=` raise) — rather than silently fabricating a meaningless `id` that every id-less entry (and
   `entry_with_id("")`) would then collide on.
-- `Xliff::Header.from_xml` now preserves namespaced attributes. A header attribute such as `xml:lang="en"`
-  was previously read as `lang=""` (prefix dropped, value erased) because it was looked up by local name;
-  attributes are now read from the parsed nodes, keeping both prefix and value.
+- `Xliff::Header.from_xml` now preserves an `xml:`-prefixed attribute. A header attribute such as
+  `xml:lang="en"` was previously read as `lang=""` (prefix dropped, value erased) because it was looked up by
+  local name; it's now read from the parsed nodes, keeping both prefix and value. An attribute under any other
+  namespace prefix is dropped, because the library can't declare it on write and keeping it would emit
+  non-well-formed XML (an undeclared prefix) — matching the build-by-hand path, which rejects such a name.
 - `Xliff::Entry` now coerces its `id` to a `String` — on both construction and assignment (`entry.id =`) — and
   `File#entry_with_id` coerces its lookup argument to match, so an entry built with an integer `id` (as in the
   README example) is found by `entry_with_id(1234)` or `entry_with_id("1234")`, consistently before and after a
