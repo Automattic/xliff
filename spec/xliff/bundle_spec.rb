@@ -177,4 +177,74 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.file_named('example.com/foo/bar/baz')).to be_nil
     end
   end
+
+  # Guards the central conformance guarantee: serialized output validates against the official OASIS XLIFF 1.2
+  # XSDs (vendored under spec/schemas). Without this, the README's "validates against the strict/transitional
+  # schema" claim is only checked by eye and can regress silently.
+  describe 'XLIFF 1.2 schema conformance', :conformance do
+    context 'with a document built from scratch' do
+      subject(:output) do
+        bundle = described_class.new
+        file = Xliff::File.new(original: 'info.plist', source_language: 'en', target_language: 'fr')
+        file.add_entry(Xliff::Entry.new(id: 1234, source: 'hello', target: 'bonjour'))
+        bundle.add_file(file)
+        bundle.to_s
+      end
+
+      it { is_expected.to conform_to_xliff_schema(:strict) }
+      it { is_expected.to conform_to_xliff_schema(:transitional) }
+    end
+
+    context 'with a source-only (untranslated) document' do
+      # No target-language and no <target> — the Xcode-untranslated shape this PR adds must stay schema-valid.
+      subject(:output) do
+        bundle = described_class.new
+        file = Xliff::File.new(original: 'x.strings', source_language: 'en')
+        file.add_entry(Xliff::Entry.new(id: 'CFBundleName', source: 'WooCommerce'))
+        bundle.add_file(file)
+        bundle.to_s
+      end
+
+      it { is_expected.to conform_to_xliff_schema(:strict) }
+      it { is_expected.to conform_to_xliff_schema(:transitional) }
+    end
+
+    context 'with a file that has no entries' do
+      # Guards the "always emit an (empty) <body>" fix: a body-less <file> is schema-invalid.
+      subject(:output) do
+        bundle = described_class.new
+        bundle.add_file(Xliff::File.new(original: 'empty.strings', source_language: 'en'))
+        bundle.to_s
+      end
+
+      it { is_expected.to conform_to_xliff_schema(:strict) }
+    end
+
+    context 'when round-tripping an Xcode export' do
+      # Xcode's <tool build-num="…"> is rejected by strict but allowed by transitional — which is why the
+      # library declares transitional. Re-serializing the parsed document must stay conformant.
+      %w[xcode-untranslated.xliff xcode-with-group.xliff infoplist-strings.xliff].each do |sample|
+        it "re-serializes #{sample} as valid transitional XLIFF" do
+          round_tripped = described_class.from_string(sample_file_contents(sample)).to_s
+          expect(round_tripped).to conform_to_xliff_schema(:transitional)
+        end
+      end
+    end
+
+    context 'with the conformance matcher itself' do
+      # A <file> with no <body> is invalid XLIFF; this guards the matcher against vacuously passing.
+      let(:bodyless) do
+        <<~XML
+          <?xml version="1.0" encoding="UTF-8"?>
+          <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+            <file original="x" source-language="en" datatype="plaintext"/>
+          </xliff>
+        XML
+      end
+
+      it 'rejects known-invalid XLIFF' do
+        expect(bodyless).not_to conform_to_xliff_schema(:strict)
+      end
+    end
+  end
 end

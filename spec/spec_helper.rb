@@ -108,3 +108,35 @@ RSpec.shared_examples 'a blank-defaulting attribute' do |default, sample|
     expect(result("  #{sample}  ")).to eq sample
   end
 end
+
+## XLIFF 1.2 Schema Validation
+
+# Compiles (once per suite) the vendored official OASIS XLIFF 1.2 XSDs under `spec/schemas`. Their `xml.xsd`
+# import is repointed at the vendored copy and resolved via the schema document's base URI, so validation
+# never touches the network.
+module XliffSchema
+  DIR = File.join(__dir__, 'schemas')
+
+  # @param variant [Symbol] `:strict` or `:transitional`.
+  # @return [Nokogiri::XML::Schema]
+  def self.[](variant)
+    (@schemas ||= {})[variant] ||= begin
+      path = File.join(DIR, "xliff-core-1.2-#{variant}.xsd")
+      Nokogiri::XML::Schema.from_document(Nokogiri::XML(File.read(path), path))
+    end
+  end
+end
+
+# Assert that a serialized XLIFF string validates against the official XLIFF 1.2 `:strict` or `:transitional`
+# schema, listing the schema's complaints when it does not.
+RSpec::Matchers.define :conform_to_xliff_schema do |variant|
+  match do |xml_string|
+    @schema_errors = XliffSchema[variant].validate(Nokogiri::XML(xml_string))
+    @schema_errors.empty?
+  end
+
+  failure_message do
+    ["expected the output to conform to the XLIFF 1.2 #{variant} schema, but it reported:",
+     *@schema_errors.map { |error| "  - #{error.message.strip}" }].join("\n")
+  end
+end
