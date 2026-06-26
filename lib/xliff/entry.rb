@@ -108,7 +108,7 @@ module Xliff
 
       Entry.new(
         id: xml['id'],
-        source: xml.child_element('source')&.content,
+        source: xml.child_element('source').content,
         target: xml.child_element('target')&.content,
         note: xml.child_element('note')&.content,
         xml_space: xml['xml:space']
