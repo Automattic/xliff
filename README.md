@@ -52,7 +52,7 @@ In the above example, `xml` reads:
 
 ## Conformance and limitations
 
-Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas. The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved from the source document when round-tripping. For a document that uses only the structure and attributes the library models – as Xcode's exports do – reading and re-writing it is byte-for-byte unchanged. The library models a fixed attribute set per element (see the limitations below); a document carrying other attributes round-trips its content but not byte-for-byte.
+Output targets **XLIFF 1.2**. Documents built from scratch validate against both the strict and transitional schemas. The declared `xsi:schemaLocation` defaults to the transitional schema – which is what real-world content such as Xcode's `<tool build-num>` conforms to – and is preserved from the source document when round-tripping. For a document that uses only the structure and attributes the library models – as Xcode's exports do – reading and re-writing it is byte-for-byte unchanged. The library models a fixed attribute set per element and re-emits those attributes in a canonical order (see the limitations below); a document carrying other attributes – or the modeled ones in a different order – round-trips its content but not byte-for-byte.
 
 A few things worth knowing:
 
