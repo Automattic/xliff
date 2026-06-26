@@ -292,6 +292,26 @@ RSpec.describe Xliff::Bundle do
       end
     end
 
+    # Characterization: the library round-trips a source's xsi:schemaLocation verbatim, so an Xcode export
+    # that declares strict while carrying the transitional-only `build-num` re-emits the same over-claim.
+    # This pins that intended trade-off — re-deriving the declaration would break the byte-identical
+    # round-trip — and closes the gap left by validating round-trips only against :transitional above.
+    context 'when a source over-declares its schema' do
+      subject(:output) { described_class.from_string(sample_file_contents('infoplist-strings.xliff')).to_s }
+
+      it "preserves the source's strict schema declaration" do
+        expect(output).to include('xliff-core-1.2-strict.xsd')
+      end
+
+      it 'does not actually satisfy the strict schema it declares (build-num is transitional-only)' do
+        expect(output).not_to conform_to_xliff_schema(:strict)
+      end
+
+      it 'satisfies the transitional schema it actually conforms to' do
+        expect(output).to conform_to_xliff_schema(:transitional)
+      end
+    end
+
     context 'with the conformance matcher itself' do
       # A <file> with no <body> is invalid XLIFF; this guards the matcher against vacuously passing.
       let(:bodyless) do
