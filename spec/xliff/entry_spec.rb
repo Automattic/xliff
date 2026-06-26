@@ -26,16 +26,12 @@ RSpec.describe Xliff::Entry do
       expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
     end
 
-    it 'rejects a nil id' do
-      expect { described_class.new(id: nil, source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
-    end
+    describe 'a blank id' do
+      def set(value)
+        described_class.new(id: value, source: 'source')
+      end
 
-    it 'rejects an empty id' do
-      expect { described_class.new(id: '', source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
-    end
-
-    it 'rejects a whitespace-only id' do
-      expect { described_class.new(id: "  \t\n", source: 'source') }.to raise_error(ArgumentError, /must not be blank/)
+      it_behaves_like 'a blank-rejecting attribute', /must not be blank/
     end
   end
 
@@ -52,12 +48,12 @@ RSpec.describe Xliff::Entry do
       expect(entry.id).to eq('5678')
     end
 
-    it 'rejects an empty assigned id' do
-      expect { new_entry.id = '' }.to raise_error(ArgumentError, /must not be blank/)
-    end
+    describe 'a blank id' do
+      def set(value)
+        new_entry.id = value
+      end
 
-    it 'rejects a whitespace-only assigned id' do
-      expect { new_entry.id = '   ' }.to raise_error(ArgumentError, /must not be blank/)
+      it_behaves_like 'a blank-rejecting attribute', /must not be blank/
     end
   end
 
@@ -92,22 +88,14 @@ RSpec.describe Xliff::Entry do
       expect(entry.xml_space).to eq 'preserve'
     end
 
-    it 'normalises a blank assigned value to "default"' do
-      entry = new_entry
-      entry.xml_space = ''
-      expect(entry.xml_space).to eq 'default'
-    end
+    describe 'a blank value' do
+      def result(value)
+        entry = new_entry
+        entry.xml_space = value
+        entry.xml_space
+      end
 
-    it 'normalises a whitespace-only assigned value to "default"' do
-      entry = new_entry
-      entry.xml_space = "  \t"
-      expect(entry.xml_space).to eq 'default'
-    end
-
-    it 'strips surrounding whitespace from a padded assigned value' do
-      entry = new_entry
-      entry.xml_space = '  preserve  '
-      expect(entry.xml_space).to eq 'preserve'
+      it_behaves_like 'a blank-defaulting attribute', 'default', 'preserve'
     end
   end
 

@@ -22,52 +22,36 @@ RSpec.describe Xliff::File do
       expect(new_file(datatype: 'php').datatype).to eq 'php'
     end
 
-    it 'rejects a nil original' do
-      expect { new_file(original: nil) }.to raise_error(ArgumentError, /original/)
+    describe 'the original attribute' do
+      def set(value)
+        new_file(original: value)
+      end
+
+      it_behaves_like 'a blank-rejecting attribute', /original/
     end
 
-    it 'rejects an empty original' do
-      expect { new_file(original: '') }.to raise_error(ArgumentError, /original/)
+    describe 'the source_language attribute' do
+      def set(value)
+        new_file(source_language: value)
+      end
+
+      it_behaves_like 'a blank-rejecting attribute', /source-language/
     end
 
-    it 'rejects a whitespace-only original' do
-      expect { new_file(original: '   ') }.to raise_error(ArgumentError, /original/)
+    describe 'the target_language attribute' do
+      def result(value)
+        new_file(target_language: value).target_language
+      end
+
+      it_behaves_like 'a blank-defaulting attribute', nil, 'fr'
     end
 
-    it 'rejects a nil source_language' do
-      expect { new_file(source_language: nil) }.to raise_error(ArgumentError, /source-language/)
-    end
+    describe 'the datatype attribute' do
+      def result(value)
+        new_file(datatype: value).datatype
+      end
 
-    it 'rejects an empty source_language' do
-      expect { new_file(source_language: '') }.to raise_error(ArgumentError, /source-language/)
-    end
-
-    it 'rejects a whitespace-only source_language' do
-      expect { new_file(source_language: '   ') }.to raise_error(ArgumentError, /source-language/)
-    end
-
-    it 'treats an empty target_language as absent' do
-      expect(new_file(target_language: '').target_language).to be_nil
-    end
-
-    it 'treats a whitespace-only target_language as absent' do
-      expect(new_file(target_language: '   ').target_language).to be_nil
-    end
-
-    it 'strips surrounding whitespace from a padded target_language' do
-      expect(new_file(target_language: '  fr  ').target_language).to eq 'fr'
-    end
-
-    it 'treats an empty datatype as the default' do
-      expect(new_file(datatype: '').datatype).to eq 'plaintext'
-    end
-
-    it 'treats a whitespace-only datatype as the default' do
-      expect(new_file(datatype: '   ').datatype).to eq 'plaintext'
-    end
-
-    it 'strips surrounding whitespace from a padded datatype' do
-      expect(new_file(datatype: '  php  ').datatype).to eq 'php'
+      it_behaves_like 'a blank-defaulting attribute', 'plaintext', 'php'
     end
 
     it 'has no files by default' do
