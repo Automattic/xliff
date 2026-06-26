@@ -82,7 +82,7 @@ module Xliff
     #
     # @return [String]
     def to_s
-      to_xml.to_xml
+      to_xml.to_s.strip
     end
 
     # Decode the given XML into an {Xliff::Header} object, if possible
