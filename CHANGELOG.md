@@ -14,10 +14,11 @@
   over-claims strict conformance. (A full byte-identical round-trip for documents with non-standard root
   attributes is tracked in [#16](https://github.com/Automattic/xliff/issues/16).)
 - `Xliff::File#unparsed_body_nodes` preserves `<body>` children the library doesn't model (`<group>`,
-  `<bin-unit>`): they're captured on parse and re-emitted on write instead of being dropped, so their nested
-  `<trans-unit>`s survive a round-trip. (Previously such an element crashed the whole parse.) Content is
-  preserved rather than reproduced byte-for-byte: nodes are re-emitted after the file's entries, and a moved
-  node in a namespaced document may gain a redundant namespace declaration. First-class support is tracked in
+  `<bin-unit>`): they're deep-copied out of the source document on parse (so it isn't retained in memory) and
+  re-emitted on write instead of being dropped, so their nested `<trans-unit>`s survive a round-trip.
+  (Previously such an element crashed the whole parse.) Content is preserved rather than reproduced
+  byte-for-byte: nodes are re-emitted after the file's entries, and a moved node in a namespaced document may
+  gain a redundant namespace declaration. First-class support is tracked in
   [#17](https://github.com/Automattic/xliff/issues/17).
 
 ### Fixed

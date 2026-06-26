@@ -15,10 +15,11 @@ module Xliff
 
     # `<body>` children the library does not model (e.g. `<group>`, `<bin-unit>`)
     #
-    # Captured from the source document on parse and re-emitted on write, so their nested content survives a
-    # round-trip even though it is not parsed into {#entries}. Content is preserved rather than reproduced
-    # byte-for-byte: the nodes are re-emitted after the file's entries, and in a namespaced document a moved
-    # node may gain a redundant namespace declaration (full fidelity is tracked in #16/#17).
+    # Deep-copied out of the source document on parse (so the source document isn't retained) and re-emitted
+    # on write, so their nested content survives a round-trip even though it is not parsed into {#entries}.
+    # Content is preserved rather than reproduced byte-for-byte: the nodes are re-emitted after the file's
+    # entries, and in a namespaced document a moved node may gain a redundant namespace declaration (full
+    # fidelity is tracked in #16/#17).
     # @return [Array<Nokogiri::XML::Node>]
     # @example Inspect the preserved (unmodeled) body children
     #   "file.unparsed_body_nodes.map(&:name)" #=> ["group"]
@@ -195,7 +196,7 @@ module Xliff
 
       trans_units, others = body.element_children.partition { |node| node.name == 'trans-unit' }
       trans_units.each { |node| file.add_entry(Entry.from_xml(node)) }
-      file.unparsed_body_nodes.concat(others)
+      file.unparsed_body_nodes.concat(others.map(&:detached_copy))
     end
 
     private

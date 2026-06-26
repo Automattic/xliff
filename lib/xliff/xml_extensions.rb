@@ -50,6 +50,20 @@ module Nokogiri
       def child_elements(name)
         element_children.select { |node| node.name == name }
       end
+
+      # A deep copy of this element re-homed into a fresh, standalone document
+      #
+      # Unlike `dup` – which keeps the copy associated with this element's source document – this re-homes the
+      # copy into a throwaway document, so holding on to the copy (e.g. in {Xliff::File#unparsed_body_nodes})
+      # doesn't keep the entire source document reachable for the copy's lifetime.
+      #
+      # @example Detach a parsed node from its source document
+      #   node.detached_copy
+      # @api private
+      # @return [Nokogiri::XML::Element]
+      def detached_copy
+        dup(1, Document.new)
+      end
     end
   end
 end

@@ -163,6 +163,13 @@ RSpec.describe Xliff::File do
       expect(reparsed.xpath("//*[local-name()='trans-unit']").map { |t| t['id'] }).to eq(%w[top inside])
     end
 
+    it 'detaches preserved <body> nodes from the source document so it can be freed' do
+      root = sample_file_xml('fragment-file-with-group.xml')
+      file = described_class.from_xml(root)
+
+      expect(file.unparsed_body_nodes.first.document).not_to be(root.document)
+    end
+
     it "reads the file's own <body>, not a <body> nested inside the <header>" do
       xml = parse_xml('<file original="a" source-language="en" datatype="plaintext">' \
                       '<header><skl><internal-file><body>skel</body></internal-file></skl></header>' \
