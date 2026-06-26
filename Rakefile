@@ -7,6 +7,12 @@ abort 'Please run rake using `bundle exec`' unless %w[BUNDLE_BIN_PATH BUNDLE_GEM
 
 RSpec::Core::RakeTask.new(:spec)
 
+# Run only the XLIFF 1.2 schema-conformance examples – validation of serialized output against the vendored
+# official OASIS XSDs (see spec/schemas). They also run as part of `spec`; this task runs them in isolation.
+RSpec::Core::RakeTask.new(:conformance) do |task|
+  task.rspec_opts = '--tag conformance'
+end
+
 require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new
