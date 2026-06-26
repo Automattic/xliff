@@ -98,8 +98,8 @@ module Xliff
     #
     # @return [Nokogiri::XML::Element]
     def to_xml
-      fragment = Nokogiri::XML.fragment('<trans-unit />')
-      trans_unit_node = fragment.at('trans-unit')
+      fragment = Nokogiri::XML.fragment('')
+      trans_unit_node = fragment.document.create_element('trans-unit')
       trans_unit_node['id'] = @id
       trans_unit_node['xml:space'] = @xml_space
 
