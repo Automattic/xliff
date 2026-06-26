@@ -20,18 +20,22 @@ module Xliff
     value.to_s.strip.empty?
   end
 
-  # Return `value` unless it is blank, in which case return `nil`.
+  # Return `value` stripped of surrounding whitespace unless it is blank, in which case return `nil`.
   #
   # The counterpart to {.blank?} for the optional, defaultable attributes, so a caller reads as
-  # `Xliff.presence(value) || default`. See {.blank?} for the definition of blank.
+  # `Xliff.presence(value) || default`. The result is stripped because these attributes carry no significant
+  # surrounding whitespace, and emitting `target-language=" fr "` / `xml:space=" preserve "` would silently
+  # mutate the canonical value on round-trip. See {.blank?} for the definition of blank.
   #
   # @api private
   # @param [String, nil] value The value to coerce.
-  # @return [String, nil] `value` when present, or `nil` when it is blank.
+  # @return [String, nil] `value` stripped of surrounding whitespace when present, or `nil` when it is blank.
   # @example Fall back to a default for a blank value
   #   Xliff.presence('   ') || 'default' #=> "default"
+  # @example Strip surrounding whitespace from a present value
+  #   Xliff.presence('  fr  ') #=> "fr"
   def self.presence(value)
-    blank?(value) ? nil : value
+    blank?(value) ? nil : value.to_s.strip
   end
 end
 

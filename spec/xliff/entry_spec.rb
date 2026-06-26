@@ -103,6 +103,12 @@ RSpec.describe Xliff::Entry do
       entry.xml_space = "  \t"
       expect(entry.xml_space).to eq 'default'
     end
+
+    it 'strips surrounding whitespace from a padded assigned value' do
+      entry = new_entry
+      entry.xml_space = '  preserve  '
+      expect(entry.xml_space).to eq 'preserve'
+    end
   end
 
   describe '.to_xml' do

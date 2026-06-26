@@ -50,6 +50,10 @@ RSpec.describe Xliff::Bundle do
       expect(bundle.schema_location).to include('xliff-core-1.2-transitional.xsd')
     end
 
+    it 'strips surrounding whitespace from a padded schema_location' do
+      expect(described_class.new(schema_location: '  urn:custom  ').schema_location).to eq 'urn:custom'
+    end
+
     it 'never emits an empty `xsi:schemaLocation`' do
       bundle = described_class.new(schema_location: '')
       bundle.add_file(new_file)

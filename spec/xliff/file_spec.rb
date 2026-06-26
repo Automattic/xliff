@@ -54,12 +54,20 @@ RSpec.describe Xliff::File do
       expect(new_file(target_language: '   ').target_language).to be_nil
     end
 
+    it 'strips surrounding whitespace from a padded target_language' do
+      expect(new_file(target_language: '  fr  ').target_language).to eq 'fr'
+    end
+
     it 'treats an empty datatype as the default' do
       expect(new_file(datatype: '').datatype).to eq 'plaintext'
     end
 
     it 'treats a whitespace-only datatype as the default' do
       expect(new_file(datatype: '   ').datatype).to eq 'plaintext'
+    end
+
+    it 'strips surrounding whitespace from a padded datatype' do
+      expect(new_file(datatype: '  php  ').datatype).to eq 'php'
     end
 
     it 'has no files by default' do
