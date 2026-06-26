@@ -176,6 +176,23 @@ RSpec.describe Xliff::Bundle do
       bundle = described_class.new
       expect(bundle.file_named('example.com/foo/bar/baz')).to be_nil
     end
+
+    # Regression: a file built with a non-String `original` (e.g. an integer) used to make `file_named`
+    # raise `TypeError` from `::File.basename`, because the value was stored uncoerced and every lookup
+    # fell through to the basename comparison.
+    it 'does not raise when a file was built with a non-String original' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 1234))
+
+      expect(bundle.file_named('nope')).to be_nil
+    end
+
+    it 'finds a file built with a non-String original by its coerced name' do
+      bundle = described_class.new
+      bundle.add_file(new_file(original: 1234))
+
+      expect(bundle.file_named('1234').original).to eq '1234'
+    end
   end
 
   # Guards the central conformance guarantee: serialized output validates against the official OASIS XLIFF 1.2

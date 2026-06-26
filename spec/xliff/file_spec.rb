@@ -22,6 +22,14 @@ RSpec.describe Xliff::File do
       expect(new_file(datatype: 'php').datatype).to eq 'php'
     end
 
+    it 'coerces a non-String original to a String (so it can never crash `Bundle#file_named`)' do
+      expect(new_file(original: 1234).original).to eq '1234'
+    end
+
+    it 'coerces a non-String source_language to a String' do
+      expect(new_file(source_language: :en).source_language).to eq 'en'
+    end
+
     describe 'the original attribute' do
       def set(value)
         new_file(original: value)

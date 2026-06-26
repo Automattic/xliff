@@ -64,6 +64,10 @@
   `File#entry_with_id` coerces its lookup argument to match, so an entry built with an integer `id` (as in the
   README example) is found by `entry_with_id(1234)` or `entry_with_id("1234")`, consistently before and after a
   serialize/parse round trip.
+- `Xliff::File` now coerces its `original` and `source-language` to a `String` on construction, matching
+  `Xliff::Entry#id`. A `File` built with a non-`String` `original` (e.g. an integer) previously crashed
+  `Bundle#file_named` with a `TypeError` from `::File.basename` — the value was stored uncoerced, so every
+  lookup fell through to the basename comparison and raised.
 - `Xliff::Header.new` now requires its `element:` argument (matching `Xliff::Entry`'s `id:` and
   `Xliff::File`'s `original:`). Building a header without one previously constructed fine and then crashed
   with an opaque Nokogiri `TypeError` at serialization; it now fails fast with a clear `ArgumentError`.
