@@ -1,6 +1,23 @@
 # frozen_string_literal: true
 
 RSpec.describe Xliff::Bundle do
+  # A document Nokogiri can only parse by recovering from a fatal error: its final tag is truncated, so the
+  # default (recovery-mode) parser yields a silently corrupted tree rather than raising. It carries a valid
+  # `<xliff>` root, so it reaches the malformed-document check rather than the root-node check.
+  let(:truncated_xliff) do
+    '<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">' \
+      '<file original="x" source-language="en"><body>' \
+      '<trans-unit id="a"><source>hi</source></trans-unit></body></file'
+  end
+
+  # A document whose `<source>` holds an unescaped `&` — a fatal XML error. Recovery-mode parsing silently
+  # drops the broken text (`A & B` becomes `A  B`) instead of raising.
+  let(:bad_entity_xliff) do
+    '<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">' \
+      '<file original="x" source-language="en"><body>' \
+      '<trans-unit id="a"><source>A & B</source></trans-unit></body></file></xliff>'
+  end
+
   describe '#initialize' do
     it 'properly stores the file path' do
       expect(described_class.new(path: File::NULL).path).to eq File::NULL
@@ -65,6 +82,14 @@ RSpec.describe Xliff::Bundle do
     it 'reads XML from the given path' do
       expect(described_class.from_path(sample_file_path('infoplist-strings.xliff'))).to be_a described_class
     end
+
+    it 'raises rather than silently recover a malformed file' do
+      Tempfile.create(['malformed', '.xliff']) do |file|
+        file.write(truncated_xliff)
+        file.flush
+        expect { described_class.from_path(file.path) }.to raise_error(/Invalid XLIFF file/)
+      end
+    end
   end
 
   describe '#from_string' do
@@ -83,11 +108,25 @@ RSpec.describe Xliff::Bundle do
           .to raise_error('Invalid XLIFF file – the root node must be `<xliff>`')
       end
     end
+
+    # Regression: a fatal well-formedness error used to yield a partial, silently corrupted bundle instead of
+    # raising — contradicting the documented "raises for invalid input" contract.
+    it 'raises rather than silently recover a truncated document' do
+      expect { described_class.from_string(truncated_xliff) }.to raise_error(/Invalid XLIFF file/)
+    end
+
+    it 'raises rather than silently drop content broken by an unescaped `&`' do
+      expect { described_class.from_string(bad_entity_xliff) }.to raise_error(/Invalid XLIFF file/)
+    end
   end
 
   describe '#from_xml' do
     it 'raises a descriptive error for nil xml, matching the other parsers' do
       expect { described_class.from_xml(nil) }.to raise_exception 'Bundle XML is nil'
+    end
+
+    it 'raises for a document that only parsed by recovering from a fatal error' do
+      expect { described_class.from_xml(Nokogiri::XML(truncated_xliff)) }.to raise_error(/Invalid XLIFF file/)
     end
   end
 

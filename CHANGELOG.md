@@ -30,6 +30,12 @@
 
 ### Fixed
 
+- `Xliff::Bundle.from_string`/`.from_path`/`.from_xml` now raise for a malformed document instead of
+  silently recovering a corrupted bundle. Nokogiri parses in recovery mode by default, so a fatal
+  well-formedness error — a truncated tag, or content broken by an unescaped `&` — used to yield a partial,
+  silently corrupted `Bundle` (e.g. `A & B` parsed to `A  B`), contradicting the documented "raises for
+  invalid input" contract. Such documents are now rejected; a warning-level problem is still tolerated, so a
+  clean document is never refused.
 - `Xliff::Bundle#to_xml`/`#to_s` now raise rather than emit a file-less `<xliff>`, which is not valid XLIFF
   (the schema requires at least one `<file>`). Previously an empty bundle serialized to just an XML
   declaration with no root element. Reading a file-less `<xliff>` is still tolerated — it parses to an empty

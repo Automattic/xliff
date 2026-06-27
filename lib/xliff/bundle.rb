@@ -158,15 +158,20 @@ module Xliff
 
     # Parse the Nokogiri XML representation of an XLIFF file to a {Bundle} object
     #
-    # Raises for invalid input
+    # Raises for invalid input, including a document Nokogiri only produced by recovering from a fatal
+    # well-formedness error (such a document is silently corrupted, so it is rejected rather than parsed).
     #
     # @param [Nokogiri::XML::Element] xml A Nokogiri XML document containing XLIFF data.
+    # @raise [RuntimeError] If `xml` is nil, has a non-`<xliff>` root, or carries a fatal parse error.
     # @return [Bundle]
     def self.from_xml(xml)
       raise 'Bundle XML is nil' if xml.nil?
 
-      root = xml.document.root
+      document = xml.document
+      root = document.root
       raise 'Invalid XLIFF file – the root node must be `<xliff>`' if root.nil? || root.name != 'xliff'
+
+      reject_malformed_document(document)
 
       declared_schema = root.attribute_with_ns('schemaLocation', XSI_NAMESPACE)&.value
       bundle = Bundle.new(schema_location: declared_schema)
@@ -183,6 +188,23 @@ module Xliff
     # @return [void]
     private_class_method def self.import_files(root, bundle)
       root.child_elements('file').each { |node| bundle.add_file File.from_xml(node) }
+    end
+
+    # Reject a document Nokogiri only produced by recovering from a malformed source
+    #
+    # Nokogiri parses in recovery mode by default: a fatal well-formedness error – a truncated tag, an
+    # unescaped `&` – doesn't raise but yields a partial, silently corrupted tree, recording the problem in
+    # `errors`. The `from_*` parsers promise to raise for invalid input, so surface the first such problem
+    # instead of building a {Bundle} from the wreckage. Only `error`/`fatal` levels (a not-well-formed
+    # document) are rejected; a warning is tolerated, so a clean document is never refused.
+    #
+    # @api private
+    # @param [Nokogiri::XML::Document] document The parsed document to inspect.
+    # @raise [RuntimeError] If the document carries an error- or fatal-level parse problem.
+    # @return [void]
+    private_class_method def self.reject_malformed_document(document)
+      malformed = document.errors.find { |error| error.error? || error.fatal? }
+      raise "Invalid XLIFF file – #{malformed.message.strip}" if malformed
     end
 
     private

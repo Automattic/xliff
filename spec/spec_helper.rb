@@ -2,6 +2,7 @@
 
 require 'xliff'
 require 'nokogiri'
+require 'tempfile'
 require 'simplecov'
 require 'simplecov-json'
 
