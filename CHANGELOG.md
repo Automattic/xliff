@@ -79,6 +79,10 @@
   `File#entry_with_id` coerces its lookup argument to match, so an entry built with an integer `id` (as in the
   README example) is found by `entry_with_id(1234)` or `entry_with_id("1234")`, consistently before and after a
   serialize/parse round trip.
+- `Xliff::Entry` now coerces its `source` to a `String` — on both construction and assignment (`entry.source =`)
+  — matching `id`, so `entry.source` reads back a `String` whatever it was built with, rather than only being
+  stringified at write time. Unlike `id`, surrounding whitespace is preserved, since source text can be
+  significant under `xml:space="preserve"`.
 - `Xliff::File` now coerces its `original` and `source-language` to a `String` on construction, matching
   `Xliff::Entry#id`. A `File` built with a non-`String` `original` (e.g. an integer) previously crashed
   `Bundle#file_named` with a `TypeError` from `::File.basename` — the value was stored uncoerced, so every

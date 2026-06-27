@@ -65,21 +65,23 @@ module Xliff
       @id = value.to_s.strip
     end
 
-    # Set the source text, rejecting a `nil` value
+    # Set the source text, coercing it to a `String` and rejecting a `nil` value
     #
     # `source` is the original string a `<trans-unit>` must carry, so a `nil` is rejected here and on
     # assignment — the way {#id=} rejects a blank id and {File} rejects a blank `original` — rather than
     # silently emitting an empty `<source/>`. An empty string is tolerated, mirroring {.from_xml}, which
-    # accepts an empty `<source>` element (liberal on read). Unlike {#id}, surrounding whitespace is kept:
-    # source text can be significant under `xml:space="preserve"`.
+    # accepts an empty `<source>` element (liberal on read). The value is coerced to a `String` (XML content
+    # always is), matching {#id=} and {File#initialize}, so {#source} reads back a `String` whatever it was
+    # built with — rather than only stringifying at {#to_xml} time. Unlike {#id}, surrounding whitespace is
+    # kept: source text can be significant under `xml:space="preserve"`.
     #
-    # @param [String] value The new source text.
+    # @param [#to_s] value The new source text.
     # @raise [ArgumentError] If `value` is `nil`.
     # @return [void]
     def source=(value)
       raise ArgumentError, 'Entry `source` must not be nil' if value.nil?
 
-      @source = value
+      @source = value.to_s
     end
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`
