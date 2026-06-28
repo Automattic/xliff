@@ -185,6 +185,16 @@ RSpec.describe Xliff::Entry do
         expect(new_entry(id: '1234').to_xml['id']).to eq '1234'
       end
 
+      it 'emits `xml:space="default"` for a default entry' do
+        expect(new_entry.to_xml['xml:space']).to eq 'default'
+      end
+
+      it 'emits the assigned `xml:space` value' do
+        entry = new_entry
+        entry.xml_space = 'preserve'
+        expect(entry.to_xml['xml:space']).to eq 'preserve'
+      end
+
       it 'has the `source` element' do
         expect(new_entry.to_xml.at('source')).not_to be_nil
       end
