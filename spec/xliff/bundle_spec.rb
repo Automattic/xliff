@@ -130,6 +130,14 @@ RSpec.describe Xliff::Bundle do
     it 'raises rather than silently drop content broken by an unescaped `&`' do
       expect { described_class.from_string(bad_entity_xliff) }.to raise_error(/Invalid XLIFF file/)
     end
+
+    # An undeclared namespace prefix is a non-fatal (level ERROR, not FATAL) problem Nokogiri recovers from.
+    # Unlike the truncated/bad-entity fixtures (both FATAL), it exercises the `error?` half of the
+    # malformed-document check, and carries a valid `<xliff>` root so it reaches that check.
+    it 'raises rather than silently recover an error-level (non-fatal) namespace problem' do
+      undeclared_prefix = '<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"><foo:bar/></xliff>'
+      expect { described_class.from_string(undeclared_prefix) }.to raise_error(/Invalid XLIFF file/)
+    end
   end
 
   describe '#from_xml' do
