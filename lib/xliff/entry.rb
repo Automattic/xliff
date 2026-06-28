@@ -19,11 +19,11 @@ module Xliff
 
     # The translated text
     # @return [String, nil]
-    attr_accessor :target
+    attr_reader :target
 
     # Documentation for translators understand the context of a string
     # @return [String, nil]
-    attr_accessor :note
+    attr_reader :note
 
     # The XML whitespace processing behaviour
     # @return [String]
@@ -42,8 +42,8 @@ module Xliff
     def initialize(id:, source:, target: nil, note: nil, xml_space: 'default')
       self.id = id
       self.source = source
-      @target = target
-      @note = note
+      self.target = target
+      self.note = note
       self.xml_space = xml_space
     end
 
@@ -82,6 +82,31 @@ module Xliff
       raise ArgumentError, 'Entry `source` must not be nil' if value.nil?
 
       @source = value.to_s
+    end
+
+    # Set the translated text, coercing a present value to a `String` while keeping an absent one `nil`
+    #
+    # `target` is optional — Xcode omits `<target>` for strings that aren't translated yet — so unlike
+    # {#source=} a `nil` is kept as `nil` (and no `<target>` is emitted). A present value is coerced to a
+    # `String`, matching {#id=}/{#source=}, so {#target} reads back a `String` whatever it was built with
+    # rather than only stringifying at {#to_xml} time. An empty string is preserved (emitted as an empty
+    # `<target/>`), keeping the translated-to-empty case distinct from untranslated.
+    #
+    # @param [#to_s, nil] value The new translated text.
+    # @return [void]
+    def target=(value)
+      @target = value&.to_s
+    end
+
+    # Set the translator note, coercing a present value to a `String` while keeping an absent one `nil`
+    #
+    # Optional like {#target=}: a `nil` is kept as `nil` (no `<note>` emitted), and a present value is coerced
+    # to a `String` to match {#id=}/{#source=} rather than stringifying only at {#to_xml} time.
+    #
+    # @param [#to_s, nil] value The new translator note.
+    # @return [void]
+    def note=(value)
+      @note = value&.to_s
     end
 
     # Set the XML whitespace processing behaviour, normalising a blank value to `default`

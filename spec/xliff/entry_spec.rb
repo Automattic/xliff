@@ -34,6 +34,14 @@ RSpec.describe Xliff::Entry do
       expect(described_class.new(id: 'x', source: 1234).source).to eq('1234')
     end
 
+    it 'coerces the target to a String' do
+      expect(described_class.new(id: 'x', source: 's', target: 1234).target).to eq('1234')
+    end
+
+    it 'coerces the note to a String' do
+      expect(described_class.new(id: 'x', source: 's', note: 1234).note).to eq('1234')
+    end
+
     it 'coerces the id to a String' do
       expect(described_class.new(id: 1234, source: 'source').id).to eq('1234')
     end
@@ -111,6 +119,18 @@ RSpec.describe Xliff::Entry do
       entry.target = 'new-target'
       expect(entry.target).to eq 'new-target'
     end
+
+    it 'coerces an assigned target to a String' do
+      entry = new_entry
+      entry.target = 1234
+      expect(entry.target).to eq('1234')
+    end
+
+    it 'keeps a nil target as nil (an untranslated string carries no target)' do
+      entry = new_entry
+      entry.target = nil
+      expect(entry.target).to be_nil
+    end
   end
 
   describe '.note=' do
@@ -118,6 +138,18 @@ RSpec.describe Xliff::Entry do
       entry = new_entry
       entry.note = 'new-note'
       expect(entry.note).to eq 'new-note'
+    end
+
+    it 'coerces an assigned note to a String' do
+      entry = new_entry
+      entry.note = 1234
+      expect(entry.note).to eq('1234')
+    end
+
+    it 'keeps a nil note as nil' do
+      entry = new_entry
+      entry.note = nil
+      expect(entry.note).to be_nil
     end
   end
 
