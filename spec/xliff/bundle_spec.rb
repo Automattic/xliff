@@ -109,6 +109,11 @@ RSpec.describe Xliff::Bundle do
       end
     end
 
+    it 'raises a clear error for a well-formed document whose root is not `<xliff>`' do
+      expect { described_class.from_string('<not-xliff/>') }
+        .to raise_error('Invalid XLIFF file – the root node must be `<xliff>`')
+    end
+
     # Regression: a fatal well-formedness error used to yield a partial, silently corrupted bundle instead of
     # raising — contradicting the documented "raises for invalid input" contract.
     it 'raises rather than silently recover a truncated document' do
