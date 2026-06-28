@@ -64,7 +64,7 @@
 - A `<trans-unit>` parsed without (or with a blank) `xml:space` attribute now falls back to the documented
   `default` value instead of serializing to an invalid `xml:space=""`.
 - `Xliff::Entry.from_xml` now raises a clear error for a `<trans-unit>` missing its mandatory `<source>`
-  element, rather than silently parsing it to `nil` and fabricating an empty `<source/>`. The optional
+  element, rather than crashing with an internal `NoMethodError`. The optional
   `<target>`/`<note>` (which Xcode omits for untranslated strings) remain tolerated.
 - `Xliff::Entry` now rejects a blank `id` — missing, empty, or whitespace-only — both when parsing (`from_xml`
   raises for a `<trans-unit>` with no `id`, `id=""`, or `id="  "`) and when building by hand (`Entry.new`/
