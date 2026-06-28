@@ -18,7 +18,7 @@ bundle.files.each do |file|
 end
 ```
 
-Strings that haven't been translated yet – the shape Xcode exports for a new locale – carry no `<target>`, so `entry.target` (and `entry.note`) may be `nil`.
+Strings that haven't been translated yet – the shape Xcode exports for a new locale – carry no `<target>`, so `entry.target` may be `nil`. A `<note>` is optional too, so `entry.note` may be `nil`.
 
 ### Creating `xliff` files
 
