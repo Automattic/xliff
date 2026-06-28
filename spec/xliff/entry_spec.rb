@@ -328,6 +328,16 @@ RSpec.describe Xliff::Entry do
       expect(described_class.from_xml(xml).note).to be_nil
     end
 
+    it 'parses an empty `<target></target>` as an empty string, distinct from a missing target' do
+      xml = parse_xml('<trans-unit id="x"><source>Hello</source><target></target></trans-unit>')
+      expect(described_class.from_xml(xml).target).to eq ''
+    end
+
+    it 'parses an empty `<note></note>` as an empty string, distinct from a missing note' do
+      xml = parse_xml('<trans-unit id="x"><source>Hello</source><note></note></trans-unit>')
+      expect(described_class.from_xml(xml).note).to eq ''
+    end
+
     it 'defaults a missing `xml:space` to "default"' do
       xml = parse_xml('<trans-unit id="x"><source>Hello</source></trans-unit>')
       expect(described_class.from_xml(xml).xml_space).to eq('default')
