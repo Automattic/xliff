@@ -114,6 +114,13 @@ RSpec.describe Xliff::Bundle do
         .to raise_error('Invalid XLIFF file – the root node must be `<xliff>`')
     end
 
+    it 'ignores a non-`<file>` element child of the `<xliff>` root' do
+      xml = '<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">' \
+            '<other-thing/>' \
+            '<file original="x" source-language="en"><body/></file></xliff>'
+      expect(described_class.from_string(xml).files.map(&:original)).to eq(['x'])
+    end
+
     # Regression: a fatal well-formedness error used to yield a partial, silently corrupted bundle instead of
     # raising — contradicting the documented "raises for invalid input" contract.
     it 'raises rather than silently recover a truncated document' do
