@@ -27,6 +27,10 @@
   carrying a skeleton round-tripped to an empty element, silently losing it.) As with `<group>`, the content
   survives but isn't reproduced byte-for-byte: a moved node in a namespaced document may gain a redundant
   namespace declaration. A header built by hand carries no child content.
+- Ship RBS type signatures (`sig/`) for the public API, so projects that type-check with Steep or RBS can
+  resolve `Xliff`'s types. `sig/manifest.yaml` declares the `nokogiri` dependency, so a consumer's
+  `rbs collection install` resolves Nokogiri's own signatures from `ruby/gem_rbs_collection` rather than this
+  gem bundling (and potentially colliding with) a stub of them.
 
 ### Fixed
 
