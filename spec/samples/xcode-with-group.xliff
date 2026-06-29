@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-transitional.xsd">
+  <file original="Resources/en.lproj/Localizable.strings" source-language="en" target-language="fr" datatype="plaintext">
+    <body>
+      <trans-unit id="top" xml:space="preserve">
+        <source>Top level</source>
+        <target>Niveau supérieur</target>
+      </trans-unit>
+      <group id="g1">
+        <trans-unit id="nested" xml:space="preserve">
+          <source>Nested</source>
+          <target>Imbriqué</target>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

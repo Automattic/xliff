@@ -7,6 +7,12 @@ abort 'Please run rake using `bundle exec`' unless %w[BUNDLE_BIN_PATH BUNDLE_GEM
 
 RSpec::Core::RakeTask.new(:spec)
 
+# Run only the XLIFF 1.2 schema-conformance examples – validation of serialized output against the vendored
+# official OASIS XSDs (see spec/schemas). They also run as part of `spec`; this task runs them in isolation.
+RSpec::Core::RakeTask.new(:conformance) do |task|
+  task.rspec_opts = '--tag conformance'
+end
+
 require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new
@@ -22,5 +28,8 @@ Yardstick::Rake::Measurement.new(:yardstick_measure) do |measurement|
 end
 
 Yardstick::Rake::Verify.new do |verify|
-  verify.threshold = 91.9
+  # Treat the threshold as a floor: fail only when documentation coverage drops below it, not when it rises
+  # above it (which would otherwise turn every documentation improvement into a CI failure).
+  verify.threshold = 92.0
+  verify.require_exact_threshold = false
 end

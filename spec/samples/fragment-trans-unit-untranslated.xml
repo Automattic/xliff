@@ -1,0 +1,4 @@
+<trans-unit id="CFBundleName" xml:space="preserve">
+  <source>WooCommerce</source>
+  <note>Bundle name</note>
+</trans-unit>
