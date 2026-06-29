@@ -1,0 +1,60 @@
+module Xliff
+  # Models a single file for translation.
+  class File
+    # The file's headers.
+    attr_reader headers: Array[Header]
+
+    # The file's translation entries.
+    attr_reader entries: Array[Entry]
+
+    # `<body>` children the library does not model, preserved across a round-trip.
+    attr_reader unparsed_body_nodes: Array[Nokogiri::XML::Node]
+
+    # The file's name in the original project.
+    attr_reader original: String
+
+    # The locale code for the source language.
+    attr_reader source_language: String
+
+    # The locale code for the translated language (nil when absent).
+    attr_reader target_language: String?
+
+    # The type of data represented (defaults to `plaintext`).
+    attr_reader datatype: String
+
+    def initialize: (original: untyped, source_language: untyped, ?target_language: untyped, ?datatype: untyped) -> void
+
+    # Add arbitrary header data to the file. Raises unless given an `Xliff::Header`.
+    def add_header: (Header header) -> void
+
+    # Add a translation entry to the file. Raises unless given an `Xliff::Entry`.
+    def add_entry: (Entry entry) -> void
+
+    # Find the first entry with the given `id`, if present.
+    def entry_with_id: (untyped id) -> Entry?
+
+    # Encode this File as a `<file>` element, including its headers and entries.
+    def to_xml: () -> Nokogiri::XML::Element
+
+    # Encode this File as an XML string.
+    def to_s: () -> String
+
+    # Decode a `<file>` element into a File. Raises for invalid input.
+    def self.from_xml: (Nokogiri::XML::Node xml) -> File
+
+    # Validate that the given XML is a usable `<file>` element. Raises otherwise.
+    def self.validate_source_xml: (untyped xml) -> void
+
+    # Import `<header>` children from the given XML. Private at runtime.
+    private def self.import_file_header: (Nokogiri::XML::Node xml, File file) -> void
+
+    # Import `<body>` children from the given XML. Private at runtime.
+    private def self.import_file_body: (Nokogiri::XML::Node xml, File file) -> void
+
+    private
+
+    def add_headers_to_file: (Nokogiri::XML::DocumentFragment fragment, Nokogiri::XML::Element node) -> void
+
+    def add_entries_to_file: (Nokogiri::XML::DocumentFragment fragment, Nokogiri::XML::Element node) -> void
+  end
+end

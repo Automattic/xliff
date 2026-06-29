@@ -1,4 +1,10 @@
+# Namespace for classes and modules that handle building and parsing XLIFF files.
+#
+# The concrete types live alongside their Ruby counterparts under `sig/xliff/`.
 module Xliff
-  VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+  # Whether `value` is blank (nil, empty, or whitespace-only) once coerced to a String.
+  def self.blank?: (untyped value) -> bool
+
+  # `value` stripped of surrounding whitespace when present, or nil when it is blank.
+  def self.presence: (untyped value) -> String?
 end

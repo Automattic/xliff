@@ -1,0 +1,21 @@
+# Extensions of the Nokogiri gem for use with this project.
+# Defined in `lib/xliff/xml_extensions.rb`. They use only node-level API and are
+# applied to `element_children` results (which Nokogiri types as `Node`), so they
+# live on `Node`.
+module Nokogiri
+  module XML
+    class Node
+      # Adds a simple text node as a child element.
+      def add_leaf_node: (element: String, content: String) -> void
+
+      # The first direct child element with the given (local) name, or nil.
+      def child_element: (String name) -> Nokogiri::XML::Node?
+
+      # All direct child elements with the given (local) name.
+      def child_elements: (String name) -> Array[Nokogiri::XML::Node]
+
+      # A deep copy of this node re-homed into a fresh, standalone document.
+      def detached_copy: () -> Nokogiri::XML::Node
+    end
+  end
+end

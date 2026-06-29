@@ -6,8 +6,8 @@ require 'nokogiri'
 module Nokogiri
   # Customizations to the Nokogiri XML namespace.
   module XML
-    # Helpers for operating on XML Elements
-    class Element
+    # Helpers for operating on XML Nodes
+    class Node
       # Adds a simple Text Node as a child element
       #
       # @param [String] element The XML tag name to use.

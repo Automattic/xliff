@@ -1,0 +1,29 @@
+module Xliff
+  # Models a file header: an element name plus key/value attributes.
+  class Header
+    VALID_ELEMENT_NAME: ::Regexp
+
+    # This header's element name.
+    attr_reader element: String
+
+    # This header's attributes.
+    attr_reader attributes: Hash[String, String]
+
+    # The element's preserved child nodes (populated only when parsed via `from_xml`).
+    attr_reader child_nodes: Array[Nokogiri::XML::Node]
+
+    def initialize: (element: untyped, ?attributes: Hash[untyped, untyped], ?validate: bool) -> void
+
+    # Encode this Header as its Nokogiri XML element.
+    def to_xml: () -> Nokogiri::XML::Element
+
+    # Encode this Header as an XML string.
+    def to_s: () -> String
+
+    # Decode an element into a Header. Raises for invalid input.
+    def self.from_xml: (Nokogiri::XML::Node xml) -> Header
+
+    # Read a header element's emittable attributes into a `{ "name" => value }` hash. Private at runtime.
+    private def self.attributes_from: (Nokogiri::XML::Element xml) -> Hash[String, String]
+  end
+end
