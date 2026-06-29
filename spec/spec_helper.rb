@@ -1,13 +1,19 @@
 # frozen_string_literal: true
 
-require 'xliff'
-require 'nokogiri'
-require 'tempfile'
 require 'simplecov'
 require 'simplecov-json'
 
-SimpleCov.start
+# Start coverage before requiring the library: otherwise `lib/` is already loaded by the time SimpleCov hooks
+# in, so it tracks only the spec files (reporting a meaningless ~100%). Filter the specs back out so the
+# number measures the code under test.
+SimpleCov.start do
+  add_filter '/spec/'
+end
 SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter unless ENV['CI'].nil?
+
+require 'xliff'
+require 'nokogiri'
+require 'tempfile'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
