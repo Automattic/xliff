@@ -10,6 +10,7 @@ pkg
 
 # Dependencies
 vendor
+.gem_rbs_collection
 
 # Tests
 .rspec_status

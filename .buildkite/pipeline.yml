@@ -48,6 +48,27 @@ steps:
       bundle install
       bundle exec rake yardstick_measure
       bundle exec rake verify_measurements
+      bundle exec rake yard:check
+    plugins: [*docker_plugin]
+
+  #################
+  # Lint (Types)
+  #################
+  - label: "🧹 Lint (Types)"
+    key: types
+    command: |
+      bundle install
+
+      echo "--- :ruby: Install RBS collection"
+      # --frozen installs strictly from the committed lock (fails on drift) instead of
+      # regenerating it, so the pinned revision is what actually gets type-checked.
+      bundle exec rbs collection install --frozen
+
+      echo "--- :ruby: Validate RBS signatures"
+      bundle exec rake rbs:validate
+
+      echo "--- :ruby: Type-check with Steep"
+      bundle exec rake steep:check
     plugins: [*docker_plugin]
 
   #################
@@ -86,6 +107,7 @@ steps:
      - rubocop
      - danger
      - lockfile
+     - types
     # Note: We intentionally call a separate `.sh` script here (as opposed to having all the
     # commands written inline) to avoid leaking a key used in the process in clear in the
     # BUILDKITE_COMMAND environment variable.
