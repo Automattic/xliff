@@ -33,3 +33,26 @@ Yardstick::Rake::Verify.new do |verify|
   verify.threshold = 92.0
   verify.require_exact_threshold = false
 end
+
+# yardstick measures coverage; this catches structural doc mistakes it doesn't (e.g. an unknown @param name).
+namespace :yard do
+  desc 'Fail if YARD emits any documentation warnings'
+  task :check do
+    sh "yard doc 'lib/**/*.rb' --no-output --no-save --fail-on-warning"
+  end
+end
+
+## Type Checking
+namespace :rbs do
+  desc 'Validate the RBS type signatures in sig/'
+  task :validate do
+    sh 'rbs -I sig validate'
+  end
+end
+
+namespace :steep do
+  desc 'Type-check lib/ against the RBS signatures with Steep'
+  task :check do
+    sh 'steep check'
+  end
+end

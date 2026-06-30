@@ -1,0 +1,5 @@
+# Declares the runtime dependencies whose RBS this gem's signatures reference, so
+# that `rbs collection install` resolves them (from ruby/gem_rbs_collection) for
+# anyone consuming xliff's shipped signatures.
+dependencies:
+  - name: nokogiri

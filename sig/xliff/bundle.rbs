@@ -1,0 +1,56 @@
+module Xliff
+  # Models a collection of files for translation.
+  class Bundle
+    # Declared so Steep can resolve the references in `lib/`; both are
+    # `private_constant` at runtime (RBS has no private-constant visibility).
+    DEFAULT_SCHEMA_LOCATION: String
+
+    XSI_NAMESPACE: String
+
+    # The translated files in this bundle.
+    attr_reader files: Array[File]
+
+    # The path on disk that this bundle was read from, if any.
+    attr_accessor path: String?
+
+    # The `xsi:schemaLocation` declared on the `<xliff>` root.
+    attr_reader schema_location: String
+
+    def initialize: (?path: String?, ?schema_location: untyped) -> void
+
+    # Set the declared `xsi:schemaLocation`, defaulting a blank value.
+    def schema_location=: (untyped value) -> void
+
+    # Add a File to the bundle.
+    def add_file: (File file) -> void
+
+    # Find a file by name, matching `original` or its basename. The first match wins.
+    def file_named: (untyped name) -> File?
+
+    # Encode this Bundle as an XLIFF document. Raises if the bundle has no files.
+    def to_xml: () -> Nokogiri::XML::Document
+
+    # Encode this Bundle as an XLIFF document string.
+    def to_s: () -> String
+
+    # Parse the XLIFF file at `path` into a Bundle. Raises for invalid input.
+    def self.from_path: (String path) -> Bundle
+
+    # Parse the XLIFF data held in `string` into a Bundle. Raises for invalid input.
+    def self.from_string: (String string) -> Bundle
+
+    # Parse a Nokogiri XLIFF document (or its `<xliff>` root element) into a Bundle.
+    # Raises for invalid input.
+    def self.from_xml: (Nokogiri::XML::Node xml) -> Bundle
+
+    # Parse each `<file>` child of the `<xliff>` root into the bundle. Private at runtime.
+    private def self.import_files: (Nokogiri::XML::Element root, Bundle bundle) -> void
+
+    # Reject a document recovered from a malformed source. Private at runtime.
+    private def self.reject_malformed_document: (Nokogiri::XML::Document document) -> void
+
+    private
+
+    def attach_xliff_metadata: (Nokogiri::XML::Element node) -> void
+  end
+end

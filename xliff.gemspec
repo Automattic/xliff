@@ -21,9 +21,19 @@ Gem::Specification.new do |spec|
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files = Dir.chdir(__dir__) do
-    `git ls-files -z`.split("\x0").reject do |f|
-      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
-    end
+    # Exclude dev-only dirs/configs and the RBS/Steep tooling. The consumer-facing
+    # signatures ship as sig/ (including sig/manifest.yaml); the Steepfile and the
+    # rbs_collection.{yaml,lock.yaml} are build-time only and must not ship.
+    excluded = %r{
+      \A(?:
+        (?:bin|test|spec|features)/
+        | \.(?:git|travis|circleci|bundle)
+        | appveyor
+        | Steepfile\z
+        | rbs_collection\.(?:lock\.)?yaml\z
+      )
+    }x
+    `git ls-files -z`.split("\x0").reject { |f| f == __FILE__ || excluded.match?(f) }
   end
 
   spec.bindir = 'bin'

@@ -1,0 +1,48 @@
+module Xliff
+  # Models a single translation string.
+  class Entry
+    # A unique identifier for this translation string.
+    attr_reader id: String
+
+    # The original text.
+    attr_reader source: String
+
+    # The translated text (nil when untranslated).
+    attr_reader target: String?
+
+    # Documentation to help translators understand the context of a string.
+    attr_reader note: String?
+
+    # The XML whitespace processing behaviour.
+    attr_reader xml_space: String
+
+    def initialize: (id: untyped, source: untyped, ?target: untyped, ?note: untyped, ?xml_space: untyped) -> void
+
+    # Set the identifier, coercing to a stripped String. Raises if blank.
+    def id=: (untyped value) -> void
+
+    # Set the source text, coercing to a String. Raises if nil.
+    def source=: (untyped value) -> void
+
+    # Set the translated text; a present value is coerced to a String, nil is kept.
+    def target=: (untyped value) -> void
+
+    # Set the translator note; a present value is coerced to a String, nil is kept.
+    def note=: (untyped value) -> void
+
+    # Set the whitespace behaviour, normalising a blank value to `default`.
+    def xml_space=: (untyped value) -> void
+
+    # Encode this Entry as a `<trans-unit>` element.
+    def to_xml: () -> Nokogiri::XML::Element
+
+    # Encode this Entry as an XML string.
+    def to_s: () -> String
+
+    # Decode a `<trans-unit>` element into an Entry. Raises for invalid input.
+    def self.from_xml: (Nokogiri::XML::Node xml) -> Entry
+
+    # Validate the XML and return its `<source>` node. Raises for invalid input.
+    def self.validate_source_xml: (untyped xml) -> Nokogiri::XML::Node
+  end
+end
