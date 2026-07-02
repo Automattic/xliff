@@ -20,28 +20,6 @@ module Xliff
     #   "bundle.path" #=> /tmp/foo.xliff
     attr_accessor :path
 
-    # The `xsi:schemaLocation` declared on the `<xliff>` root
-    #
-    # Preserved from the source document when parsing (an absent or blank declaration falls back to the
-    # default), and defaulting to the XLIFF 1.2 transitional schema for bundles built from scratch.
-    # @!attribute [rw] schema_location
-    # @return [String]
-    # @api public
-    # @example Retrieve the schema location
-    #   "bundle.schema_location" #=> "urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/..."
-    attr_reader :schema_location
-
-    # The default `xsi:schemaLocation` for bundles built from scratch: XLIFF 1.2 transitional, not strict,
-    # because the library round-trips real-world content (e.g. Xcode's `<tool build-num>`) that only the
-    # transitional schema accepts. A parsed bundle keeps whatever its source document declared instead.
-    DEFAULT_SCHEMA_LOCATION = 'urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-transitional.xsd'
-    private_constant :DEFAULT_SCHEMA_LOCATION
-
-    # The XML Schema instance namespace. Used to locate the `schemaLocation` declaration by namespace rather
-    # than by a hard-coded `xsi:` prefix, so a document that binds it to a different prefix is still preserved.
-    XSI_NAMESPACE = 'http://www.w3.org/2001/XMLSchema-instance'
-    private_constant :XSI_NAMESPACE
-
     # Create a blank {Bundle} object, suitable for building an XLIFF file by hand
     #
     # @param [String] path An optional path to where the file should be stored on disk.
@@ -50,10 +28,24 @@ module Xliff
     #   bundle.new
     # @example Create an empty XLIFF bundle with a pre-specified path
     #   bundle.new(path: /path/to/my/output/file.xliff)
-    def initialize(path: nil, schema_location: DEFAULT_SCHEMA_LOCATION)
+    def initialize(path: nil, schema_location: nil)
       @path = path
-      self.schema_location = schema_location
       @files = []
+      @root_attributes = RootAttributes.default(schema_location)
+    end
+
+    # The `xsi:schemaLocation` declared on the `<xliff>` root
+    #
+    # Preserved from the source document when parsing, located by the prefix bound to the XML Schema instance
+    # namespace (so a non-`xsi` prefix is read correctly), and defaulting to the XLIFF 1.2 transitional schema
+    # for bundles built from scratch. `nil` when a parsed document declared none (it is optional in XLIFF 1.2).
+    #
+    # @return [String, nil]
+    # @api public
+    # @example Retrieve the schema location
+    #   "bundle.schema_location" #=> "urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/..."
+    def schema_location
+      @root_attributes.schema_location
     end
 
     # Set the declared `xsi:schemaLocation`, defaulting a blank value
@@ -66,7 +58,7 @@ module Xliff
     # @example Reset to the default
     #   "bundle.schema_location = nil" #=> declares the XLIFF 1.2 transitional schema
     def schema_location=(value)
-      @schema_location = Xliff.presence(value) || DEFAULT_SCHEMA_LOCATION
+      @root_attributes.schema_location = value
     end
 
     # Add an additional {File} object to the bundle
@@ -103,6 +95,12 @@ module Xliff
 
     # Encode this {Bundle} object as an XLIFF document
     #
+    # The `<xliff>` root carries the preserved attribute set (its namespace declarations and attributes); a
+    # parsed bundle keeps whatever its source declared, a from-scratch bundle the XLIFF 1.2 defaults. The set
+    # is re-emitted in libxml2's canonical attribute order — semantically identical to the source and
+    # byte-identical for an Xcode export, though a differently-ordered root is normalised on write (see
+    # {RootAttributes}).
+    #
     # @raise [RuntimeError] If the bundle has no files; XLIFF requires at least one `<file>`, so a file-less
     #   bundle has no valid serialization. (Reading a file-less `<xliff>` is still tolerated.)
     # @return [Nokogiri::XML::Document]
@@ -113,7 +111,7 @@ module Xliff
       document.encoding = 'UTF-8'
 
       xliff_node = document.create_element('xliff')
-      attach_xliff_metadata(xliff_node)
+      @root_attributes.attach_to(xliff_node)
 
       @files.each do |file|
         xliff_node.add_child(file.to_xml)
@@ -161,6 +159,9 @@ module Xliff
     # Raises for invalid input, including a document Nokogiri only produced by recovering from a fatal
     # well-formedness error (such a document is silently corrupted, so it is rejected rather than parsed).
     #
+    # The `<xliff>` root's full attribute set — namespace declarations and attributes — is captured and
+    # replayed on write, re-emitted in libxml2's canonical attribute order (see {RootAttributes}).
+    #
     # @param [Nokogiri::XML::Element] xml A Nokogiri XML document containing XLIFF data.
     # @raise [RuntimeError] If `xml` is nil, has a non-`<xliff>` root, or carries a fatal parse error.
     # @return [Bundle]
@@ -173,8 +174,8 @@ module Xliff
 
       reject_malformed_document(document)
 
-      declared_schema = root.attribute_with_ns('schemaLocation', XSI_NAMESPACE)&.value
-      bundle = Bundle.new(schema_location: declared_schema)
+      bundle = new
+      bundle.send(:root_attributes=, RootAttributes.capture(root))
       import_files(root, bundle)
 
       bundle
@@ -209,16 +210,14 @@ module Xliff
 
     private
 
-    # Attach the required XLIFF metadata to the given `node`
+    # Install a captured root attribute set, replacing the defaults
     #
-    # Currently only supports XLIFF 1.2.
+    # Replaces the default attributes {#initialize} set up with those captured from a parsed document. Used by
+    # {.from_xml}.
+    #
     # @api private
+    # @param [RootAttributes] root_attributes The captured attribute set.
     # @return [void]
-    def attach_xliff_metadata(node)
-      node['xmlns'] = 'urn:oasis:names:tc:xliff:document:1.2'
-      node['xmlns:xsi'] = XSI_NAMESPACE
-      node['version'] = '1.2'
-      node['xsi:schemaLocation'] = @schema_location
-    end
+    attr_writer :root_attributes
   end
 end

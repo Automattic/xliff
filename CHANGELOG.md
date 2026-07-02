@@ -11,8 +11,26 @@
   rather than a hard-coded `xsi:` prefix, so a document that binds it to a different prefix isn't silently
   downgraded — and bundles built from scratch default to the XLIFF 1.2 **transitional** schema (which is what
   real-world content such as Xcode's `<tool build-num>` conforms to), so the declared schema no longer
-  over-claims strict conformance. (A full byte-identical round-trip for documents with non-standard root
-  attributes is tracked in [#16](https://github.com/Automattic/xliff/issues/16).)
+  over-claims strict conformance. (It now reports `nil` for a parsed document that declares no
+  `xsi:schemaLocation`, rather than a defaulted value that wouldn't be re-emitted.)
+- The `<xliff>` root element's **full attribute set** is now preserved, not just the four standard
+  declarations. Its namespace declarations and attributes — including a schema-instance namespace bound to a
+  non-`xsi` prefix, an omitted (optional) `xsi:schemaLocation`, and any vendor extension — are captured on
+  parse and replayed on write. (Previously every root was re-emitted with exactly `xmlns`/`xmlns:xsi`/
+  `version`/`xsi:schemaLocation`, so a document differing from Xcode's shape was silently rewritten — gaining
+  a defaulted `xsi:schemaLocation` it had omitted, re-emitting a non-`xsi` schema-instance prefix as `xsi:`,
+  or dropping an extra root attribute.) `version` (which the schema marks required on `<xliff>`) and a default
+  `xmlns` for the XLIFF namespace are still re-asserted when a source omits them, so a root that would
+  otherwise serialize as invalid is healed rather than faithfully reproduced. (The schema requires only that
+  the elements be *in* the namespace; the default `xmlns` is this library's constraint, since it emits
+  unprefixed `<xliff>`/`<file>`. A present-but-non-standard *value*, such as a non-XLIFF default namespace, is
+  left as captured — the separate concern tracked in [#32](https://github.com/Automattic/xliff/issues/32).)
+  `Xliff::Bundle#schema_location` is now a view over
+  this set. The attributes are re-emitted in Nokogiri's canonical order, which is byte-identical for an Xcode
+  export (and
+  any already-canonical root); a differently-ordered root is reformatted to that order on write, and is
+  byte-stable thereafter, so the library can be used to normalise a tree without ongoing diff churn. Resolves
+  [#16](https://github.com/Automattic/xliff/issues/16).
 - `Xliff::File#unparsed_body_nodes` preserves `<body>` children the library doesn't model (`<group>`,
   `<bin-unit>`): they're deep-copied out of the source document on parse (so it isn't retained in memory) and
   re-emitted on write instead of being dropped, so their nested `<trans-unit>`s survive a round-trip.
