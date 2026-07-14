@@ -19,5 +19,5 @@ gem 'danger', '~> 9.6'
 gem 'danger-rubocop', '~> 0.13'
 gem 'danger-simplecov_json', '~> 0.3'
 
-gem 'yard', '~> 0.9.44'
+gem 'yard', '~> 0.9.45'
 gem 'yardstick', '~> 0.9.9'
