@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-require 'xliff'
-require 'nokogiri'
-require 'tempfile'
 require 'simplecov'
 require 'simplecov-json'
 
 SimpleCov.start
 SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter unless ENV['CI'].nil?
+
+require 'xliff'
+require 'nokogiri'
+require 'tempfile'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
