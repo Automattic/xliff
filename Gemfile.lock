@@ -138,7 +138,7 @@ GEM
     sawyer (0.9.3)
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
-    simplecov (1.0.1)
+    simplecov (1.0.2)
     simplecov-json (0.2.3)
       json
       simplecov
@@ -172,7 +172,7 @@ DEPENDENCIES
   rubocop (~> 1.88)
   rubocop-rake (~> 0.7.1)
   rubocop-rspec (~> 3.10)
-  simplecov (~> 1.0.1)
+  simplecov (~> 1.0.2)
   simplecov-json (~> 0.2)
   xliff!
   yard (~> 0.9.45)

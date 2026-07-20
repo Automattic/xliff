@@ -12,7 +12,7 @@ gem 'rubocop', '~> 1.88'
 gem 'rubocop-rake', '~> 0.7.1'
 gem 'rubocop-rspec', '~> 3.10'
 
-gem 'simplecov', '~> 1.0.1'
+gem 'simplecov', '~> 1.0.2'
 gem 'simplecov-json', '~> 0.2'
 
 gem 'danger', '~> 9.6'
